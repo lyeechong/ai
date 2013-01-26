@@ -82,108 +82,56 @@ def depthFirstSearch(problem):
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
   "*** YOUR CODE HERE ***"
-  
-  #cross your fingers hope it works, it's depth first search and it has its quirks!
-  #AGGGHHH PYTHON!
-  
-  import time
 
-  currentPath = []
-  visited = [] #a list of visited spots, so we don't go around in circles...
-  
-  startState = problem.getStartState()
-  visited.append(startState)
-
-  once = True
-  
-  print "Init spot ", startState
-  
-  #start the loop...
-  print "Cometh, the while loop!"
-  
-  done = False
-  
-  while(not done):
-    #check to see if we're at the finish!
-    
-    print "while loop begin", once
-    
-    if not once:
-      print "Curr spot ", currentPath[-1][0]
-    
-    if once and problem.isGoalState(startState):
-        print "Done 1 hit!"
-        done = True
-        break
-    elif not once and problem.isGoalState(currentPath[-1][0]):
-      print "Done 2 hit!"
-      #we're done!
-      done = True
-      break
-    else:
-      #otherwise... we're not!
-      print "hit the else"
-      
-      if once:
-        successors = problem.getSuccessors(startState)
-      else:
-        successors = problem.getSuccessors(currentPath[-1][0])
-      
-      notVisited = 0
-      print "starting for loop seach for a successor"
-      for choice in reversed(successors):
-        print "\tchoice[0] ", choice[0], "\n\tvisited ", visited
-        if not choice[0] in visited:
-          print "Found successor ", choice[0]
-          notVisited = choice
-          break
-      
-      while notVisited is 0:
-        print "Could not find avail successors, time to pop! "
-        print "Popped ", currentPath.pop()[0]
-        successors = problem.getSuccessors(currentPath[-1][0])
-        notVisited = 0
-        for choice in reversed(successors):
-          if not choice[0] in visited:
-            notVisited = choice
-            break
-      
-      print "Adding to the path, ", notVisited[0]
-      currentPath.append(notVisited)
-      visited.append(notVisited[0])
-      once = False
-      
-      print "--OUR CURRENT PATH-- :: "
-      for pos in currentPath:
-        print pos, ", "
-      
-      print "\nSleeping!"
-#      time.sleep(1)
-      print "Done sleeping!\n"
-  
-  print "Done with the big while loop!"
-  
-  #whew! we're out of the while loop!
-  #hopefully we found the goal...
-  
-  #let's print the path we found to see if it's correct...
-  #print "path stack ", currentPath
-
-  path = [] #this is the path we will return
-  
-  while not len(currentPath) is 0:
-    item = currentPath.pop()[1]
-    print "inserting item into path : ", item
-    path.insert(0, item) #insert into the front of the list
-    
-  return path #yup! we're done!
-      
-  "end our code here!"
-
+  import copy
+  closed = []
+  fringe = util.Stack()
+  fringe.push(((problem.getStartState(),'West',1),[]))
+  while True:
+    if(fringe.isEmpty()):
+      print "failed"
+      return []
+    node = fringe.pop()
+    if problem.isGoalState(node[0][0]):
+      print "success ", node[1]
+      return node[1]
+    if not node[0][0] in closed:
+      closed.append(node[0][0])
+      print "Kendall's node is ", node[0]
+      successors = problem.getSuccessors(node[0][0])
+      print 'length of successors ', len(successors)
+      for choice in successors:
+        tempList = copy.deepcopy(node[1])
+        tempList.append(choice[1])
+        fringe.push((choice,tempList))
+        
+        
+        
+        
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  import copy
+  closed = []
+  fringe = util.Queue()
+  fringe.push(((problem.getStartState(),'West',1),[]))
+  while True:
+    if(fringe.isEmpty()):
+      print "failed"
+      return []
+    node = fringe.pop()
+    if problem.isGoalState(node[0][0]):
+      print "success ", node[1]
+      return node[1]
+    if not node[0][0] in closed:
+      closed.append(node[0][0])
+      print "Kendall's node is ", node[0]
+      successors = problem.getSuccessors(node[0][0])
+      print 'length of successors ', len(successors)
+      for choice in successors:
+        tempList = copy.deepcopy(node[1])
+        tempList.append(choice[1])
+        fringe.push((choice,tempList))
       
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
