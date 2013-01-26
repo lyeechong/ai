@@ -86,43 +86,53 @@ def depthFirstSearch(problem):
   #cross your fingers hope it works, it's depth first search and it has its quirks!
   #AGGGHHH PYTHON!
   
+  import time
+
   currentPath = []
   visited = [] #a list of visited spots, so we don't go around in circles...
   
   startState = problem.getStartState()
   visited.append(startState)
 
-  bool once = True
+  once = True
   
   print "Init spot ", startState
   
   #start the loop...
   print "Cometh, the while loop!"
+  
   done = False
+  
   while(not done):
     #check to see if we're at the finish!
     
-    if not len(currentPath) is 0:
+    print "while loop begin", once
+    
+    if not once:
       print "Curr spot ", currentPath[-1][0]
     
-    if once:
-      if problem.isGoalState(startState):
+    if once and problem.isGoalState(startState):
+        print "Done 1 hit!"
         done = True
         break
-    elif problem.isGoalState(currentPath[-1][0]):
+    elif not once and problem.isGoalState(currentPath[-1][0]):
+      print "Done 2 hit!"
       #we're done!
       done = True
       break
     else:
       #otherwise... we're not!
-
+      print "hit the else"
+      
       if once:
         successors = problem.getSuccessors(startState)
       else:
         successors = problem.getSuccessors(currentPath[-1][0])
       
       notVisited = 0
+      print "starting for loop seach for a successor"
       for choice in successors:
+        print "\tchoice[0] ", choice[0], "\n\tvisited ", visited
         if not choice[0] in visited:
           print "Found successor ", choice[0]
           notVisited = choice
@@ -138,8 +148,21 @@ def depthFirstSearch(problem):
             notVisited = choice
             break
       
+      print "Adding to the path, ", notVisited[0]
       currentPath.append(notVisited)
+      visited.append(notVisited[0])
+      once = False
       
+      print "--OUR CURRENT PATH-- :: "
+      for pos in currentPath:
+        print pos, ", "
+      
+      print "\nSleeping!"
+#      time.sleep(1)
+      print "Done sleeping!\n"
+  
+  print "Done with the big while loop!"
+  
   #whew! we're out of the while loop!
   #hopefully we found the goal...
   
@@ -148,7 +171,7 @@ def depthFirstSearch(problem):
 
   path = [] #this is the path we will return
   
-  while not currentPath.isEmpty():
+  while not len(currentPath) is 0:
     item = currentPath.pop()[1]
     print "inserting item into path : ", item
     path.insert(0, item) #insert into the front of the list
