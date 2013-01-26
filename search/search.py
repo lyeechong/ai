@@ -86,72 +86,60 @@ def depthFirstSearch(problem):
   #cross your fingers hope it works, it's depth first search and it has its quirks!
   #AGGGHHH PYTHON!
   
-  from game import Directions
-  n = Directions.NORTH
-  e = Directions.EAST
-  s = Directions.SOUTH
-  w = Directions.WEST
-  cardinalDirections = [n,e,s,w] #mmm... not used... yet
-  
-  import util #for the stack! #isn't this already imported at the top...?
-  currentPath = util.Stack()
-  resultPath = util.Stack()
-  alreadyInStack = []
-
+  currentPath = []
   visited = [] #a list of visited spots, so we don't go around in circles...
   
   startState = problem.getStartState()
-  print "The start state       : ", startState
-  print "Is it the goal state? : ", problem.isGoalState(startState)
-  print "The successors are    : ", problem.getSuccessors(startState)
+  visited.append(startState)
+
+  bool once = True
   
-  currentState = problem.getStartState() 
-  visited.append(currentState)
+  print "Init spot ", startState
   
   #start the loop...
   print "Cometh, the while loop!"
   done = False
   while(not done):
-    print "Current state ", currentState
-    print "Visited spots ", visited
     #check to see if we're at the finish!
-    if problem.isGoalState(currentState):
+    
+    if not len(currentPath) is 0:
+      print "Curr spot ", currentPath[-1][0]
+    
+    if once:
+      if problem.isGoalState(startState):
+        done = True
+        break
+    elif problem.isGoalState(currentPath[-1][0]):
       #we're done!
       done = True
       break
     else:
       #otherwise... we're not!
-      successors = problem.getSuccessors(currentState)
+
+      if once:
+        successors = problem.getSuccessors(startState)
+      else:
+        successors = problem.getSuccessors(currentPath[-1][0])
       
-      tempSuccessors = successors
+      notVisited = 0
+      for choice in successors:
+        if not choice[0] in visited:
+          print "Found successor ", choice[0]
+          notVisited = choice
+          break
       
-      for choice in successors:
-        if choice[0] not in visited:
-          tempSuccessors.remove(choice)
-
-      #we need to go deeper...
-      for choice in successors:
-        #if choice[0] not in visited:
-        if choice not in alreadyInStack:
-          alreadyInStack.append(choice)
-          currentPath.push(choice)
-
-      if len(successors) is 0:
-        resultPath.pop()
-
-      if currentPath.isEmpty():
-        #well... it's empty, which means we exhausted all the routes and didn't find the goal :(
-        done = True
-        break
-        
-      visited.append(currentState)
-      pop = currentPath.pop()
-      if(len(alreadyInStack) >= 1):
-        alreadyInStack.pop()
-      resultPath.push(pop)
-      currentState = pop[0] #updates the new state to the last one pushed on the stack
-      #currentPath.push(pop)#once you pop, the fun don't stop
-  
+      while notVisited is 0:
+        print "Could not find avail successors, time to pop! "
+        print "Popped ", currentPath.pop()[0]
+        successors = problem.getSuccessors(currentPath[-1][0])
+        notVisited = 0
+        for choice in successors:
+          if not choice[0] in visited:
+            notVisited = choice
+            break
+      
+      currentPath.append(notVisited)
+      
   #whew! we're out of the while loop!
   #hopefully we found the goal...
   
@@ -160,8 +148,8 @@ def depthFirstSearch(problem):
 
   path = [] #this is the path we will return
   
-  while not resultPath.isEmpty():
-    item = resultPath.pop()[1]
+  while not currentPath.isEmpty():
+    item = currentPath.pop()[1]
     print "inserting item into path : ", item
     path.insert(0, item) #insert into the front of the list
     
