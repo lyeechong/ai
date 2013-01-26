@@ -131,7 +131,7 @@ def depthFirstSearch(problem):
       
       notVisited = 0
       print "starting for loop seach for a successor"
-      for choice in successors:
+      for choice in reversed(successors):
         print "\tchoice[0] ", choice[0], "\n\tvisited ", visited
         if not choice[0] in visited:
           print "Found successor ", choice[0]
@@ -143,7 +143,7 @@ def depthFirstSearch(problem):
         print "Popped ", currentPath.pop()[0]
         successors = problem.getSuccessors(currentPath[-1][0])
         notVisited = 0
-        for choice in successors:
+        for choice in reversed(successors):
           if not choice[0] in visited:
             notVisited = choice
             break
