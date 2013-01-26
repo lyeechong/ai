@@ -93,9 +93,11 @@ def depthFirstSearch(problem):
   w = Directions.WEST
   cardinalDirections = [n,e,s,w] #mmm... not used... yet
   
-  import util #for the stack!
+  import util #for the stack! #isn't this already imported at the top...?
   currentPath = util.Stack()
-  
+  resultPath = util.Stack()
+  alreadyInStack = []
+
   visited = [] #a list of visited spots, so we don't go around in circles...
   
   startState = problem.getStartState()
@@ -120,12 +122,23 @@ def depthFirstSearch(problem):
     else:
       #otherwise... we're not!
       successors = problem.getSuccessors(currentState)
+      
+      tempSuccessors = successors
+      
+      for choice in successors:
+        if choice[0] not in visited:
+          tempSuccessors.remove(choice)
 
       #we need to go deeper...
       for choice in successors:
-        if choice[0] not in visited:
+        #if choice[0] not in visited:
+        if choice not in alreadyInStack:
+          alreadyInStack.append(choice)
           currentPath.push(choice)
-      
+
+      if len(successors) is 0:
+        resultPath.pop()
+
       if currentPath.isEmpty():
         #well... it's empty, which means we exhausted all the routes and didn't find the goal :(
         done = True
@@ -133,15 +146,22 @@ def depthFirstSearch(problem):
         
       visited.append(currentState)
       pop = currentPath.pop()
+      if(len(alreadyInStack) >= 1):
+        alreadyInStack.pop()
+      resultPath.push(pop)
       currentState = pop[0] #updates the new state to the last one pushed on the stack
+      #currentPath.push(pop)#once you pop, the fun don't stop
   
   #whew! we're out of the while loop!
   #hopefully we found the goal...
   
+  #let's print the path we found to see if it's correct...
+  #print "path stack ", currentPath
+
   path = [] #this is the path we will return
   
-  while not currentPath.isEmpty():
-    item = currentPath.pop()[1]
+  while not resultPath.isEmpty():
+    item = resultPath.pop()[1]
     print "inserting item into path : ", item
     path.insert(0, item) #insert into the front of the list
     
