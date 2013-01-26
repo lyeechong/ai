@@ -82,7 +82,72 @@ def depthFirstSearch(problem):
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  
+  #cross your fingers hope it works, it's depth first search and it has its quirks!
+  #AGGGHHH PYTHON!
+  
+  from game import Directions
+  n = Directions.NORTH
+  e = Directions.EAST
+  s = Directions.SOUTH
+  w = Directions.WEST
+  cardinalDirections = [n,e,s,w] #mmm... not used... yet
+  
+  import util #for the stack!
+  currentPath = util.Stack()
+  
+  visited = [] #a list of visited spots, so we don't go around in circles...
+  
+  startState = problem.getStartState()
+  print "The start state       : ", startState
+  print "Is it the goal state? : ", problem.isGoalState(startState)
+  print "The successors are    : ", problem.getSuccessors(startState)
+  
+  currentState = problem.getStartState() 
+  visited.append(currentState)
+  
+  #start the loop...
+  print "Cometh, the while loop!"
+  done = False
+  while(not done):
+    print "Current state ", currentState
+    print "Visited spots ", visited
+    #check to see if we're at the finish!
+    if problem.isGoalState(currentState):
+      #we're done!
+      done = True
+      break
+    else:
+      #otherwise... we're not!
+      successors = problem.getSuccessors(currentState)
+
+      #we need to go deeper...
+      for choice in successors:
+        if choice[0] not in visited:
+          currentPath.push(choice)
+      
+      if currentPath.isEmpty():
+        #well... it's empty, which means we exhausted all the routes and didn't find the goal :(
+        done = True
+        break
+        
+      visited.append(currentState)
+      pop = currentPath.pop()
+      currentState = pop[0] #updates the new state to the last one pushed on the stack
+  
+  #whew! we're out of the while loop!
+  #hopefully we found the goal...
+  
+  path = [] #this is the path we will return
+  
+  while not currentPath.isEmpty():
+    item = currentPath.pop()[1]
+    print "inserting item into path : ", item
+    path.insert(0, item) #insert into the front of the list
+    
+  return path #yup! we're done!
+      
+  "end our code here!"
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
