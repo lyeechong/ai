@@ -281,13 +281,15 @@ class CornersProblem(search.SearchProblem):
   def getStartState(self):
     "Returns the start state (in your state space, not the full Pacman state space)"
     "*** YOUR CODE HERE ***"
-    return [self.startingPosition, [[True, True],[True,True]]]
+    return [self.startingPosition, self.corners]
     #return self.startingPosition
     
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    return not (state[1][0][0] or state[1][0][1] or state[1][1][0] or state [1][1][1])
+    print "did we reach the goal? ", len(state[1]) is 0, " state[1] is : ", state[1]
+    return len(state[1]) is 0
+    #return not (state[1][0][0] or state[1][0][1] or state[1][1][0] or state [1][1][1])
     #return state in self.corners
        
   def getSuccessors(self, state):
@@ -317,6 +319,17 @@ class CornersProblem(search.SearchProblem):
       hitsWall = self.walls[nextx][nexty]
 
       if not hitsWall:
+        temp = []
+        for i in state[1]:
+          print "\t i is ", i, " and state[0] is ", state[0], " if not i is state[0] yields", not i is state[0]
+          if not (i[0] is nextx and i[1] is nexty):
+            temp.append(i)
+        print "appending!"
+        print "the tuple is ", tuple(temp)
+        successors.append(( ((nextx, nexty), tuple(temp)), action, 1))
+        
+          
+      """
         if nextx is self.corners[1][0] and nexty is self.corners[1][1]:
           successors.append((((nextx, nexty),((False, state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
         if nextx is self.corners[0][0] and nexty is self.corners[0][1]:
@@ -327,7 +340,7 @@ class CornersProblem(search.SearchProblem):
           successors.append((((nextx, nexty),((state[1][0][0], False),(state[1][1][0],state[1][1][1]))),action,1))
         else: 
           successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
-      
+      """
 
       
     self._expanded += 1
