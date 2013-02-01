@@ -318,15 +318,15 @@ class CornersProblem(search.SearchProblem):
 
       if not hitsWall:
         if nextx is self.corners[1][0] and nexty is self.corners[1][1]:
-          successors.append(([(nextx, nexty),[[False, state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
+          successors.append((((nextx, nexty),((False, state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
         if nextx is self.corners[0][0] and nexty is self.corners[0][1]:
-          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[False,state[1][1][1]]]],action,1))
+          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(False,state[1][1][1]))),action,1))
         if nextx is self.corners[2][0] and nexty is self.corners[2][1]:
-          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],False]]],action,1))
+          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(state[1][1][0],False))),action,1))
         if nextx is self.corners[3][0] and nexty is self.corners[3][1]:
-          successors.append(([(nextx, nexty),[[state[1][0][0], False],[state[1][1][0],state[1][1][1]]]],action,1))
+          successors.append((((nextx, nexty),((state[1][0][0], False),(state[1][1][0],state[1][1][1]))),action,1))
         else: 
-          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
+          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
       
 
       
