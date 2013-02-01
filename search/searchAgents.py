@@ -287,7 +287,7 @@ class CornersProblem(search.SearchProblem):
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    return not (state[1][0][0] and state[1][0][1] and state[1][1][0] and state [1][1][1])
+    return not (state[1][0][0] or state[1][0][1] or state[1][1][0] or state [1][1][1])
     #return state in self.corners
        
   def getSuccessors(self, state):
@@ -317,17 +317,19 @@ class CornersProblem(search.SearchProblem):
       nextx, nexty = int(x + dx), int(y + dy)
       hitsWall = self.walls[nextx][nexty]
       if not hitsWall:
-        if (nextx, nexty) is (1,top):
-          successors.append(([(nextx, nexty),[[False, state[1][0][1]],[state[1][1][0],state[1][1][1]]],action,1))
-        elif (nextx, nexty) is (1,1):
-          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[False,state[1][1][1]]],action,1))
-        elif (nextx, nexty) is (right,1):
-          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],False]],action,1))
-        elif (nextx, nexty) is (right,top):
-          successors.append(([(nextx, nexty),[[state[1][0][0], False],[state[1][1][0],state[1][1][1]]],action,1))
+      #    self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        print "heyyyyyyyyyyyyyyyyyy", nextx, "aghhhhhhhh", nexty, "cornerssssssssssssssss", self.corners
+        if (nextx, nexty) is self.corners[1]: 
+          successors.append(([(nextx, nexty),[[False, state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
+        elif (nextx, nexty) is self.corners[0]:
+          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[False,state[1][1][1]]]],action,1))
+        elif (nextx, nexty) is self.corners[2]:
+          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],False]]],action,1))
+        elif (nextx, nexty) is self.corners[3]:
+          successors.append(([(nextx, nexty),[[state[1][0][0], False],[state[1][1][0],state[1][1][1]]]],action,1))
         else: 
-          print "NOOOOOOOOOOOOOOOOOOOOOOOOOO"
-        #successors.append(([(nextx, nexty),,action,1) )
+          print "we hit the else!"
+          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
       
 
       
