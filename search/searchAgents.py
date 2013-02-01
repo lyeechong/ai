@@ -281,7 +281,7 @@ class CornersProblem(search.SearchProblem):
   def getStartState(self):
     "Returns the start state (in your state space, not the full Pacman state space)"
     "*** YOUR CODE HERE ***"
-    return [self.startingPosition, self.corners]
+    return (self.startingPosition, self.corners)
     #return self.startingPosition
     
   def isGoalState(self, state):
@@ -321,11 +321,11 @@ class CornersProblem(search.SearchProblem):
       if not hitsWall:
         temp = []
         for i in state[1]:
-          print "\t i is ", i, " and state[0] is ", state[0], " if not i is state[0] yields", not i is state[0]
+          #print "\t i is ", i, " and state[0] is ", state[0], " if not i is state[0] yields", not i is state[0]
           if not (i[0] is nextx and i[1] is nexty):
             temp.append(i)
-        print "appending!"
-        print "the tuple is ", tuple(temp)
+        #print "appending!"
+        #print "the list is ", temp, " and the tuple is ", tuple(temp)
         successors.append(( ((nextx, nexty), tuple(temp)), action, 1))
         
           
@@ -378,7 +378,29 @@ def cornersHeuristic(state, problem):
   walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
   
   "*** YOUR CODE HERE ***"
-  return 0 # Default to trivial solution
+  xy1 = state[0]
+  print "length of goals we still need to go to ", state[1]
+  import sys
+  import time
+  
+  if len(state[1]) == 2:
+    while(True):
+      time.sleep(1)
+    
+    
+  closest = (42, 42)
+    
+  smallest = sys.maxint
+  for corner in state[1]:  
+    xy2 = corner
+    dist = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    if dist< smallest:
+      smallest = dist
+      closest = corner
+  print "smallest is ", smallest
+  print "closest corner is ", closest, "when pac-man is at ", state[0]
+  
+  return smallest
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
