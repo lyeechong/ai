@@ -89,17 +89,13 @@ def depthFirstSearch(problem):
   fringe.push(((problem.getStartState(),'West',1),[]))
   while True:
     if(fringe.isEmpty()):
-      print "failed"
       return []
     node = fringe.pop()
     if problem.isGoalState(node[0][0]):
-      print "success ", node[1]
       return node[1]
     if not node[0][0] in closed:
       closed.append(node[0][0])
-      print "Kendall's node is ", node[0]
       successors = problem.getSuccessors(node[0][0])
-      print 'length of successors ', len(successors)
       for choice in successors:
         tempList = copy.deepcopy(node[1])
         tempList.append(choice[1])
@@ -117,17 +113,13 @@ def breadthFirstSearch(problem):
   fringe.push(((problem.getStartState(),'West',1),[]))
   while True:
     if(fringe.isEmpty()):
-      print "failed"
       return []
     node = fringe.pop()
     if problem.isGoalState(node[0][0]):
-      print "success ", node[1]
       return node[1]
     if not node[0][0] in closed:
       closed.append(node[0][0])
-      print "Kendall's node is ", node[0]
       successors = problem.getSuccessors(node[0][0])
-      print 'length of successors ', len(successors)
       for choice in successors:
         tempList = copy.deepcopy(node[1])
         tempList.append(choice[1])
@@ -142,21 +134,17 @@ def uniformCostSearch(problem):
   fringe.push(((problem.getStartState(),'West',1),[]),1)
   while True:
     if(fringe.isEmpty()):
-      print "failed"
       return []
     node = fringe.pop()
     if problem.isGoalState(node[0][0]):
-      print "success ", node[1]
       return node[1]
     if not node[0][0] in closed:
       closed.append(node[0][0])
-      print "Kendall's node is ", node[0]
       successors = problem.getSuccessors(node[0][0])
-      print 'length of successors ', len(successors)
       for choice in successors:
         tempList = copy.deepcopy(node[1])
         tempList.append(choice[1])
-        fringe.push((choice,tempList),choice[2])
+        fringe.push((choice,tempList),problem.getCostOfActions(tempList))
 
 def nullHeuristic(state, problem=None):
   """
@@ -168,7 +156,25 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  import copy
+  closed = []
+  fringe = util.PriorityQueue()
+  fringe.push(((problem.getStartState(),'West',1),[]),1)
+  while True:
+    if(fringe.isEmpty()):
+      return []
+    node = fringe.pop()
+    if problem.isGoalState(node[0][0]):
+      return node[1]
+    if not node[0][0] in closed:
+      closed.append(node[0][0])
+      successors = problem.getSuccessors(node[0][0])
+      for choice in successors:
+        tempList = copy.deepcopy(node[1])
+        tempList.append(choice[1])
+        fringe.push((choice,tempList),problem.getCostOfActions(tempList)+heuristic(choice[0],problem))
+
+
     
   
 # Abbreviations

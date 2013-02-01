@@ -281,12 +281,14 @@ class CornersProblem(search.SearchProblem):
   def getStartState(self):
     "Returns the start state (in your state space, not the full Pacman state space)"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return [self.startingPosition, [[True, True],[True,True]]]
+    #return self.startingPosition
     
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return not (state[1][0][0] and state[1][0][1] and state[1][1][0] and state [1][1][1])
+    #return state in self.corners
        
   def getSuccessors(self, state):
     """
@@ -310,6 +312,16 @@ class CornersProblem(search.SearchProblem):
       #   hitsWall = self.walls[nextx][nexty]
       
       "*** YOUR CODE HERE ***"
+      x,y = state[0]
+      dx, dy = Actions.directionToVector(action)
+      nextx, nexty = int(x + dx), int(y + dy)
+      hitsWall = self.walls[nextx][nexty]
+      if not hitsWall:
+        if nextx, nexty == (1,1):
+          successors.append(([(nextx, nexty),[[
+        successors.append(([(nextx, nexty),,action,1) )
+      
+
       
     self._expanded += 1
     return successors
@@ -463,9 +475,13 @@ class ClosestDotSearchAgent(SearchAgent):
     food = gameState.getFood()
     walls = gameState.getWalls()
     problem = AnyFoodSearchProblem(gameState)
-
+    
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return search.breadthFirstSearch(problem)
+    
+
+    "end our code here"
+  
   
 class AnyFoodSearchProblem(PositionSearchProblem):
   """
@@ -501,7 +517,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
     x,y = state
     
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    return self.food[x][y]
+
+    "end our code here"
 
 ##################
 # Mini-contest 1 #
