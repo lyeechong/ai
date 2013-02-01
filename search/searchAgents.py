@@ -317,9 +317,17 @@ class CornersProblem(search.SearchProblem):
       nextx, nexty = int(x + dx), int(y + dy)
       hitsWall = self.walls[nextx][nexty]
       if not hitsWall:
-        if nextx, nexty == (1,1):
-          successors.append(([(nextx, nexty),[[
-        successors.append(([(nextx, nexty),,action,1) )
+        if (nextx, nexty) is (1,top):
+          successors.append(([(nextx, nexty),[[False, state[1][0][1]],[state[1][1][0],state[1][1][1]]],action,1))
+        elif (nextx, nexty) is (1,1):
+          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[False,state[1][1][1]]],action,1))
+        elif (nextx, nexty) is (right,1):
+          successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],False]],action,1))
+        elif (nextx, nexty) is (right,top):
+          successors.append(([(nextx, nexty),[[state[1][0][0], False],[state[1][1][0],state[1][1][1]]],action,1))
+        else: 
+          print "NOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        #successors.append(([(nextx, nexty),,action,1) )
       
 
       
