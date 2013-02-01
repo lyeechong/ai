@@ -301,8 +301,6 @@ class CornersProblem(search.SearchProblem):
      required to get there, and 'stepCost' is the incremental 
      cost of expanding to that successor
     """
-    print "pacman currently located at ", state[0]
-    print "goal states are right now", state[1]
     successors = []
     for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
       # Add a successor state to the successor list if the action is legal
@@ -319,29 +317,20 @@ class CornersProblem(search.SearchProblem):
       hitsWall = self.walls[nextx][nexty]
 
       if not hitsWall:
-      #    self.corners = ((1,1), (1,top), (right, 1), (right, top))
-        print "heyyyyyyyyyyyyyyyyyy", nextx, "aghhhhhhhh", nexty, "cornerssssssssssssssss", self.corners
-        #if (nextx, nexty) is self.corners[1]:
         if nextx is self.corners[1][0] and nexty is self.corners[1][1]:
-          print "reached the top left" 
           successors.append(([(nextx, nexty),[[False, state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
         if nextx is self.corners[0][0] and nexty is self.corners[0][1]:
-          print "reached the bottom left"
           successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[False,state[1][1][1]]]],action,1))
         if nextx is self.corners[2][0] and nexty is self.corners[2][1]:
-          print "reached the bottom right"
           successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],False]]],action,1))
         if nextx is self.corners[3][0] and nexty is self.corners[3][1]:
-          print "reached the top right"
           successors.append(([(nextx, nexty),[[state[1][0][0], False],[state[1][1][0],state[1][1][1]]]],action,1))
         else: 
-          print "we hit the else!"
           successors.append(([(nextx, nexty),[[state[1][0][0], state[1][0][1]],[state[1][1][0],state[1][1][1]]]],action,1))
       
 
       
     self._expanded += 1
-    print "\n"
     return successors
 
   def getCostOfActions(self, actions):
