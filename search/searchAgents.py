@@ -287,7 +287,7 @@ class CornersProblem(search.SearchProblem):
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    print "did we reach the goal? ", len(state[1]) is 0, " state[1] is : ", state[1]
+    #print "did we reach the goal? ", len(state[1]) is 0, " state[1] is : ", state[1]
     return len(state[1]) is 0
     #return not (state[1][0][0] or state[1][0][1] or state[1][1][0] or state [1][1][1])
     #return state in self.corners
@@ -321,27 +321,10 @@ class CornersProblem(search.SearchProblem):
       if not hitsWall:
         temp = []
         for i in state[1]:
-          #print "\t i is ", i, " and state[0] is ", state[0], " if not i is state[0] yields", not i is state[0]
           if not (i[0] is nextx and i[1] is nexty):
             temp.append(i)
-        #print "appending!"
-        #print "the list is ", temp, " and the tuple is ", tuple(temp)
         successors.append(( ((nextx, nexty), tuple(temp)), action, 1))
         
-          
-      """
-        if nextx is self.corners[1][0] and nexty is self.corners[1][1]:
-          successors.append((((nextx, nexty),((False, state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
-        if nextx is self.corners[0][0] and nexty is self.corners[0][1]:
-          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(False,state[1][1][1]))),action,1))
-        if nextx is self.corners[2][0] and nexty is self.corners[2][1]:
-          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(state[1][1][0],False))),action,1))
-        if nextx is self.corners[3][0] and nexty is self.corners[3][1]:
-          successors.append((((nextx, nexty),((state[1][0][0], False),(state[1][1][0],state[1][1][1]))),action,1))
-        else: 
-          successors.append((((nextx, nexty),((state[1][0][0], state[1][0][1]),(state[1][1][0],state[1][1][1]))),action,1))
-      """
-
       
     self._expanded += 1
     return successors
@@ -379,28 +362,21 @@ def cornersHeuristic(state, problem):
   
   "*** YOUR CODE HERE ***"
   xy1 = state[0]
-  print "length of goals we still need to go to ", state[1]
+  #print "length of goals we still need to go to ", state[1]
   import sys
-  import time
   
-  if len(state[1]) == 2:
-    while(True):
-      time.sleep(1)
-    
-    
-  closest = (42, 42)
-    
-  smallest = sys.maxint
+  #LARGEST CODE
+  
+  largest = -sys.maxint -1
   for corner in state[1]:  
     xy2 = corner
     dist = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-    if dist< smallest:
-      smallest = dist
-      closest = corner
-  print "smallest is ", smallest
-  print "closest corner is ", closest, "when pac-man is at ", state[0]
+    if dist > largest:
+      largest = dist
   
-  return smallest
+  return largest
+  #END LARGEST CODE
+
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -491,7 +467,94 @@ def foodHeuristic(state, problem):
   """
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
-  return 0
+  
+  """ KENDALL CODE #1
+  value=0
+  x=state[0][0]
+  y=state[0][1]
+  mat = state[1]
+  for i in range(-1,1):
+    if y+i in range(mat.width) and x-1 in range(mat.height) and mat[x-1][y+i]:
+      value+=1
+    if y+i in range(mat.width) and x in range(mat.height) and mat[x][y+i]:
+      value+=1
+    if y+i in range(mat.width) and x+1 in range(mat.height) and mat[x+1][y+i]:
+      value+=1
+  """
+  
+  """ KENDALL CODE #2
+  value = 0
+  for i in range(-1,1):
+    if state[0][1]+i in range(len(state[1][0])) and state[0][0]-1 in range(len[state[1][ state[1][state[0][0]-1][state[0][i+state[0][1]]]:
+      value+=1
+    if state[0][1]+i in range(len(state[0])) and state[1][state[0][0]][state[0][i+state[0][1]]]:
+      value+=1
+    if state[0][1]+i in range(len(state[0])) and state[1][state[0][0]+1][state[0][i+state[0][1]]]:
+      value+=1
+     """ 
+  
+  #LYEE CODE #1
+  
+  startPos = state[0] #pac man's position
+  foodList = state[1].asList() #the food
+  sizeTo = 10
+  if len(foodList) < sizeTo:
+    sizeTo = len(foodList)
+  foodList = foodList[:sizeTo]
+  
+  import itertools
+  results = itertools.permutations(foodList)
+  
+  import sys
+  shortestPathLength = sys.maxint
+  
+  shortestPath = (0,0,0,0,0)
+  
+  for result in results:
+  
+    currentPathLength = 0
+    previousPosition = startPos
+    completed = True
+    for pellet in result: #go through all the pellets on this route
+    
+      #do manhattan between the two pellets
+      xy1 = previousPosition
+      xy2 = pellet
+      moveCost = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+      currentPathLength = currentPathLength + moveCost
+      previousPosition = pellet
+      
+      #stop calculating if the path is longer than the current shortest route
+      if currentPathLength > shortestPathLength:
+        completed = False #mark the path as incomplete and we aborted
+        continue
+    # -- end inner for loop        
+    if completed: #so if the path was not aborted
+      shortestPath = result
+      shortestPathLength = currentPathLength
+    
+    #restting the variables for the next iteration
+    currentPathLength = 0
+    previousPosition = startPos
+    completed = True
+    
+  # -- end outer for loop
+
+  temp = []
+  xy1 = startPos
+  for x in shortestPath:
+    temp.append(x)
+  for i in range(1,10):
+    temp.append(startPos)
+    
+  shortestPath = tuple(temp)
+  if len(shortestPath) < 1:
+    xy2 = shortestPath[0]
+  else:
+    xy2 = shortestPath[1]
+  value = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]) 
+  
+  return value
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"

@@ -173,10 +173,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         tempList = copy.deepcopy(node[1])
         tempList.append(choice[1])
         fringe.push((choice,tempList),problem.getCostOfActions(tempList)+heuristic(choice[0],problem))
-        print "AGHHHHHHHHHHHHHHHH " , heuristic(choice[0],problem)
-
-
-    
+  
   
 # Abbreviations
 bfs = breadthFirstSearch
