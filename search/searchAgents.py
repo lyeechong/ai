@@ -493,11 +493,12 @@ def foodHeuristic(state, problem):
       value+=1
      """ 
   
+  """
   #LYEE CODE #1
   
   startPos = state[0] #pac man's position
   foodList = state[1].asList() #the food
-  sizeTo = 10
+  sizeTo = 3
   if len(foodList) < sizeTo:
     sizeTo = len(foodList)
   foodList = foodList[:sizeTo]
@@ -554,7 +555,96 @@ def foodHeuristic(state, problem):
     xy2 = shortestPath[1]
   value = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]) 
   
+  
+  
+  
   return value
+  """
+  
+  """  
+  # KENDALL MINI CODE!
+  if foodGrid[position[0]][position[1]]:
+    return 0
+  return 1
+  """
+  
+  """
+  #LYEE GAS CAR IDEA
+  startPos = state[0] #pac man's position
+  
+  #check north
+  curposx = startPos[0]
+  curposy = startPos[1]
+  
+  countN = 0
+  while True:
+    food = foodGrid[curposx][curposy]
+    if not food:
+      break
+    curposy = curposy + 1
+    countN = countN + 1
+  
+  #check south
+  curposx = startPos[0]
+  curposy = startPos[1]
+  
+  countS = 0
+  while True:
+    food = foodGrid[curposx][curposy]
+    if not food:
+      break
+    curposy = curposy - 1  
+    countS = countS + 1
+  
+  #check east
+  curposx = startPos[0]
+  curposy = startPos[1]
+  
+  countE = 0
+  while True:
+    food = foodGrid[curposx][curposy]
+    if not food:
+      break
+    curposx = curposx + 1  
+    countE = countE + 1
+  
+  #check west
+  curposx = startPos[0]
+  curposy = startPos[1]
+  
+  countW = 0
+  while True:
+    food = foodGrid[curposx][curposy]
+    if not food:
+      break
+    curposx = curposx - 1  
+    countW = countW + 1
+  
+  #done!
+  
+  numDotsInMaze = len(foodGrid.asList())
+  #numFound = countN + countE + countS + countW
+  numFound = max(max(countN,countE),max(countS,countW))
+  return numDotsInMaze - numFound
+  """
+  
+  value = min(4, len(foodGrid.asList()))
+  if foodGrid[position[0]][position[1]]:
+    value-=1
+  if position[0]-1 > 0:
+    if foodGrid[position[0]-1][position[1]]:
+      value-=1
+  if position[0]+1<foodGrid.width:
+    if foodGrid[position[0]+1][position[1]]:
+      value-=1
+  if position[1]-1>0:
+    if foodGrid[position[0]][position[1]-1]:
+      value-=1
+  if position[1]+1<foodGrid.height:
+    if foodGrid[position[0]][position[1]+1]:
+      value-=1
+  return value
+  
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
