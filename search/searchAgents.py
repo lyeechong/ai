@@ -627,7 +627,9 @@ def foodHeuristic(state, problem):
   numFound = max(max(countN,countE),max(countS,countW))
   return numDotsInMaze - numFound
   """
-  
+ 
+
+  """
   value = min(4, len(foodGrid.asList()))
   if foodGrid[position[0]][position[1]]:
     value-=1
@@ -644,7 +646,105 @@ def foodHeuristic(state, problem):
     if foodGrid[position[0]][position[1]+1]:
       value-=1
   return value
-  
+  """
+  """
+  import sys
+  #loop through all of the dots and find the closest one (Manhattan distance)
+  smallest = sys.maxint
+  xy1 = position
+  target=None
+  for dot in foodGrid.asList():
+    xy2 = dot
+    temp=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    if temp<smallest:
+      target=dot
+      smallest=temp
+  return smallest 
+  """
+  """
+  import sys
+  #loop through all of the dots and find the furthest one (Manhattan distance)
+  largest = -sys.maxint-1
+  xy1 = position
+  target=None
+  for dot in foodGrid.asList():
+    xy2 = dot
+    temp=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    if temp>largest:
+      target=dot
+      largest=temp
+  return largest 
+  """
+  import sys
+  #We're gonna see how many dots we get on the way to the farthest dot (from the closest dot), in the optimistic case of no walls. Then, we add the number of dots remaining that we didn't get
+  largest = -sys.maxint-1
+  xy1 = position
+  target = None
+
+
+
+################################################################################
+#UNDER CONSTRUCTION! Comment this section out to see sub-9000 score (unless I broke something else by editing this... should be fine as long as xy1=position)
+
+  #loop through all of the dots and find the closest one (Manhattan distance)
+  smallest = sys.maxint
+  for dot in foodGrid.asList():
+    xy2 = dot
+    temp=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    if temp<smallest:
+      target=dot
+      smallest=temp
+  xy1=target
+################################################################################
+
+  for dot in foodGrid.asList():
+    dx=0
+    dy=0
+    xy2=dot
+    if dot[0]<xy1[0]:
+      dx=-1
+    else:
+      dx=1
+    if dot[1]<xy1[1]:
+      dy=-1
+    else:
+      dy=1
+    #first, we move horizontally, then vertically. Later we do the opposite, and take the max of these
+    dotCount=0
+    manhattanDistance=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    for i in range(xy1[0],dot[0],dx):
+      if foodGrid[i][xy1[1]]:
+        dotCount+=1
+    for i in range(xy1[1],dot[1],dy):
+      if foodGrid[dot[0]][i]:
+        dotCount+=1
+
+
+    secondDotCount=0
+
+    #now we do vertical first, then horizontal
+    for i in range(xy1[1],dot[1],dy):
+      if foodGrid[xy1[0]][i]:
+        secondDotCount+=1
+    for i in range(xy1[0],dot[0],dx):
+      if foodGrid[i][dot[1]]:
+        secondDotCount+=1
+
+
+    #Be optimistic about how many dots we got
+    dotCount=max(dotCount, secondDotCount)
+    #So we know the distance to the fursthest dot, and the most optimistic number of dots we could've gotten along the way. So if there are dots left over, we have to take at least the number of dots more steps to get them all
+    h = manhattanDistance+(len(foodGrid.asList())-dotCount)
+    #okay, so now is this the best?
+    """
+    if h>largest:
+      #does target even matter???
+      target=dot
+      largest=h
+    """
+    largest=max(h,largest)
+  return largest
+    
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
