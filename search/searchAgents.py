@@ -468,213 +468,6 @@ def foodHeuristic(state, problem):
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
   
-  """ KENDALL CODE #1
-  value=0
-  x=state[0][0]
-  y=state[0][1]
-  mat = state[1]
-  for i in range(-1,1):
-    if y+i in range(mat.width) and x-1 in range(mat.height) and mat[x-1][y+i]:
-      value+=1
-    if y+i in range(mat.width) and x in range(mat.height) and mat[x][y+i]:
-      value+=1
-    if y+i in range(mat.width) and x+1 in range(mat.height) and mat[x+1][y+i]:
-      value+=1
-  """
-  
-  """ KENDALL CODE #2
-  value = 0
-  for i in range(-1,1):
-    if state[0][1]+i in range(len(state[1][0])) and state[0][0]-1 in range(len[state[1][ state[1][state[0][0]-1][state[0][i+state[0][1]]]:
-      value+=1
-    if state[0][1]+i in range(len(state[0])) and state[1][state[0][0]][state[0][i+state[0][1]]]:
-      value+=1
-    if state[0][1]+i in range(len(state[0])) and state[1][state[0][0]+1][state[0][i+state[0][1]]]:
-      value+=1
-     """ 
-  
-  """
-  #LYEE CODE #1
-  
-  startPos = state[0] #pac man's position
-  foodList = state[1].asList() #the food
-  sizeTo = 3
-  if len(foodList) < sizeTo:
-    sizeTo = len(foodList)
-  foodList = foodList[:sizeTo]
-  
-  import itertools
-  results = itertools.permutations(foodList)
-  
-  import sys
-  shortestPathLength = sys.maxint
-  
-  shortestPath = (0,0,0,0,0)
-  
-  for result in results:
-  
-    currentPathLength = 0
-    previousPosition = startPos
-    completed = True
-    for pellet in result: #go through all the pellets on this route
-    
-      #do manhattan between the two pellets
-      xy1 = previousPosition
-      xy2 = pellet
-      moveCost = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-      currentPathLength = currentPathLength + moveCost
-      previousPosition = pellet
-      
-      #stop calculating if the path is longer than the current shortest route
-      if currentPathLength > shortestPathLength:
-        completed = False #mark the path as incomplete and we aborted
-        continue
-    # -- end inner for loop        
-    if completed: #so if the path was not aborted
-      shortestPath = result
-      shortestPathLength = currentPathLength
-    
-    #restting the variables for the next iteration
-    currentPathLength = 0
-    previousPosition = startPos
-    completed = True
-    
-  # -- end outer for loop
-
-  temp = []
-  xy1 = startPos
-  for x in shortestPath:
-    temp.append(x)
-  for i in range(1,10):
-    temp.append(startPos)
-    
-  shortestPath = tuple(temp)
-  if len(shortestPath) < 1:
-    xy2 = shortestPath[0]
-  else:
-    xy2 = shortestPath[1]
-  value = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]) 
-  
-  
-  
-  
-  return value
-  """
-  
-  """  
-  # KENDALL MINI CODE!
-  if foodGrid[position[0]][position[1]]:
-    return 0
-  return 1
-  """
-  
-  """
-  #LYEE GAS CAR IDEA
-  startPos = state[0] #pac man's position
-  
-  #check north
-  curposx = startPos[0]
-  curposy = startPos[1]
-  
-  countN = 0
-  while True:
-    food = foodGrid[curposx][curposy]
-    if not food:
-      break
-    curposy = curposy + 1
-    countN = countN + 1
-  
-  #check south
-  curposx = startPos[0]
-  curposy = startPos[1]
-  
-  countS = 0
-  while True:
-    food = foodGrid[curposx][curposy]
-    if not food:
-      break
-    curposy = curposy - 1  
-    countS = countS + 1
-  
-  #check east
-  curposx = startPos[0]
-  curposy = startPos[1]
-  
-  countE = 0
-  while True:
-    food = foodGrid[curposx][curposy]
-    if not food:
-      break
-    curposx = curposx + 1  
-    countE = countE + 1
-  
-  #check west
-  curposx = startPos[0]
-  curposy = startPos[1]
-  
-  countW = 0
-  while True:
-    food = foodGrid[curposx][curposy]
-    if not food:
-      break
-    curposx = curposx - 1  
-    countW = countW + 1
-  
-  #done!
-  
-  numDotsInMaze = len(foodGrid.asList())
-  #numFound = countN + countE + countS + countW
-  numFound = max(max(countN,countE),max(countS,countW))
-  return numDotsInMaze - numFound
-  """
- 
-
-  """
-  value = min(4, len(foodGrid.asList()))
-  if foodGrid[position[0]][position[1]]:
-    value-=1
-  if position[0]-1 > 0:
-    if foodGrid[position[0]-1][position[1]]:
-      value-=1
-  if position[0]+1<foodGrid.width:
-    if foodGrid[position[0]+1][position[1]]:
-      value-=1
-  if position[1]-1>0:
-    if foodGrid[position[0]][position[1]-1]:
-      value-=1
-  if position[1]+1<foodGrid.height:
-    if foodGrid[position[0]][position[1]+1]:
-      value-=1
-  return value
-  """
-  """
-  import sys
-  #loop through all of the dots and find the closest one (Manhattan distance)
-  smallest = sys.maxint
-  xy1 = position
-  target=None
-  for dot in foodGrid.asList():
-    xy2 = dot
-    temp=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-    if temp<smallest:
-      target=dot
-      smallest=temp
-  return smallest 
-  """
-  """
-  import sys
-  #loop through all of the dots and find the furthest one (Manhattan distance)
-  largest = -sys.maxint-1
-  xy1 = position
-  target=None
-  for dot in foodGrid.asList():
-    xy2 = dot
-    temp=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
-    if temp>largest:
-      target=dot
-      largest=temp
-  return largest 
-  """
   import sys
   #We're gonna see how many dots we get on the way to the farthest dot (from the closest dot), in the optimistic case of no walls. Then, we add the number of dots remaining that we didn't get
   largest = -sys.maxint-1
@@ -685,8 +478,7 @@ def foodHeuristic(state, problem):
   food = foodGrid.asList()
   food.sort()
   
-################################################################################
-#UNDER CONSTRUCTION! Comment this section out to see sub-9000 score (unless I broke something else by editing this... should be fine as long as xy1=position)
+
 
   #loop through all of the dots and find the closest one (Manhattan distance)
   smallest = sys.maxint
@@ -700,9 +492,7 @@ def foodHeuristic(state, problem):
     return 0
   xy1=target
   smallDist = abs(position[0] - xy1[0]) + abs(position[1] - xy1[1])
-  print 'closest: ',xy1
-################################################################################
-  
+
 
   #loop through all of the dots and find the furthest one (Manhattan distance)
   largest = -sys.maxint-1
@@ -717,9 +507,8 @@ def foodHeuristic(state, problem):
     return 0
     print 'error, empty dot list'
   xy2=target
-  print 'farthest: ',xy2
 
-  #for dot in foodGrid.asList():
+
   dx=0
   dy=0
   if xy2[0]<xy1[0]:
@@ -730,7 +519,8 @@ def foodHeuristic(state, problem):
     dy=-1
   else:
     dy=1
-  #first, we move horizontally, then vertically. Later we do the opposite, and take the max of these
+    
+  #first, we move horizontally, then vertically
   dotCount=0
   manhattanDistance=abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
   for i in range(xy1[0],xy2[0],dx):
@@ -739,41 +529,13 @@ def foodHeuristic(state, problem):
   for i in range(xy1[1],xy2[1]+dy,dy):
     if foodGrid[xy2[0]][i]:
       dotCount+=1
-  print 'first dot count: ',dotCount
 
-  """
-  secondDotCount=0
 
-  #now we do vertical first, then horizontal
-  for i in range(xy1[1],xy2[1],dy):
-    if foodGrid[xy1[0]][i]:
-      secondDotCount+=1
-  for i in range(xy1[0],xy2[0]+dx,dx):
-    if foodGrid[i][xy2[1]]:
-      secondDotCount+=1
-  print 'second dot count: ',secondDotCount
 
-  #Be optimistic about how many dots we got
-  dotCount=max(dotCount, secondDotCount)
-  print 'final dot count: ',dotCount
-  """
-  #we forgot to add one for when we got to the closest dot
-  #dotCount+=1
   #So we know the distance to the fursthest dot, and the most optimistic number of dots we could've gotten along the way. So if there are dots left over, we have to take at least the number of dots more steps to get them all
   
-  print 'manhattan: ',manhattanDistance
-  print 'smallDist: ',smallDist
-  print 'num remaining dots after naive: ',len(food)-dotCount
   h = manhattanDistance+(len(food)-dotCount)+(smallDist-1)
-  """
-  #okay, so now is this the best?
-  if h>largest:
-    #does target even matter???
-    target=dot
-    largest=h
 
-  largest=max(h,largest)#+smallest
-  """
   return h
     
   
