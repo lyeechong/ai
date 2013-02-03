@@ -741,7 +741,7 @@ def foodHeuristic(state, problem):
       dotCount+=1
   print 'first dot count: ',dotCount
 
-
+  """
   secondDotCount=0
 
   #now we do vertical first, then horizontal
@@ -756,6 +756,7 @@ def foodHeuristic(state, problem):
   #Be optimistic about how many dots we got
   dotCount=max(dotCount, secondDotCount)
   print 'final dot count: ',dotCount
+  """
   #we forgot to add one for when we got to the closest dot
   #dotCount+=1
   #So we know the distance to the fursthest dot, and the most optimistic number of dots we could've gotten along the way. So if there are dots left over, we have to take at least the number of dots more steps to get them all
