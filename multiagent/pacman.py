@@ -637,7 +637,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
       cPickle.dump(components, f)
       f.close()
 
-  if numGames > 1:
+  if (numGames-numTraining) > 0:
     scores = [game.state.getScore() for game in games]
     wins = [game.state.isWin() for game in games]
     winRate = wins.count(True)/ float(len(wins))
