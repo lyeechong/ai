@@ -68,7 +68,22 @@ class ReflexAgent(Agent):
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
     "*** YOUR CODE HERE ***"
-    return successorGameState.getScore()
+    # OUR CODE HERE
+    res = 0
+    runForLife = False
+    for ghost in newGhostStates:
+      ghostPos = ghost.getPosition()
+      if abs(newPos[0] - ghostPos[0]) < 3 and abs(newPos[1] - ghostPos[1]) < 3:
+        runForLife = True
+    
+    if runForLife:
+      res = 100
+        
+    return res
+    # END OUR CODE
+    
+    #their original return
+    #return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
   """
