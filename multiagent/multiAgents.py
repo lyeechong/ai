@@ -68,19 +68,33 @@ class ReflexAgent(Agent):
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
     "*** YOUR CODE HERE ***"
-    # OUR CODE HERE
-    res = 0
-    runForLife = False
+
+    score = 10000
+    if successorGameState.isWin():
+      return 100000000
     for ghost in newGhostStates:
       ghostPos = ghost.getPosition()
-      if abs(newPos[0] - ghostPos[0]) < 3 and abs(newPos[1] - ghostPos[1]) < 3:
-        runForLife = True
-    
-    if runForLife:
-      res = 100
+      if util.manhattanDistance(ghostPos, newPos) < 2:
+        score -= 10000
+    nearFood = 100
+    for foodPos in oldFood.asList():
+      dist = util.manhattanDistance(foodPos, newPos)
+      if (dist < nearFood):
+        nearFood = dist
+    if (currentGameState.getNumFood() < successorGameState.getNumFood()):
+      score -= 100
+
+    if action == Directions.WEST:
+      score -= 3
         
-    return res
-    # END OUR CODE
+    for scareTime in newScaredTimes:
+      score += scareTime * 10
+
+    score -= 5 * nearFood
+    capsuleplaces = currentGameState.getCapsules()
+    if successorGameState.getPacmanPosition() in capsuleplaces:
+        score += 1200
+    return max(score, 0)
     
     #their original return
     #return successorGameState.getScore()
