@@ -76,24 +76,32 @@ class ReflexAgent(Agent):
       ghostPos = ghost.getPosition()
       if util.manhattanDistance(ghostPos, newPos) < 2:
         score -= 10000
-    nearFood = 100
+      else:
+        score += util.manhattanDistance(ghostPos, newPos)
+    nearFood = 1000
+    farFood = 1000
     for foodPos in oldFood.asList():
       dist = util.manhattanDistance(foodPos, newPos)
       if (dist < nearFood):
         nearFood = dist
+      if (dist > farFood):
+        farFood = dist
     if (currentGameState.getNumFood() < successorGameState.getNumFood()):
-      score -= 100
+      score -= 7
 
     if action == Directions.WEST:
-      score -= 3
+      score -= 1
+    if action == Directions.STOP:
+      score -= 2
         
     for scareTime in newScaredTimes:
-      score += scareTime * 10
+      score += scareTime * 1
 
-    score -= 5 * nearFood
+    score -= 2 * farFood
+    score -= 4 * nearFood
     capsuleplaces = currentGameState.getCapsules()
     if successorGameState.getPacmanPosition() in capsuleplaces:
-        score += 1200
+        score += 4
     return max(score, 0)
     
     #their original return
