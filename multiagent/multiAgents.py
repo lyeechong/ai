@@ -167,54 +167,45 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns the total number of agents in the game
     """
     "*** YOUR CODE HERE ***"
+
+    
     import time
-    def MaxValue(gameState, currentDepth):
-      if currentDepth is self.depth:
+    def MaxValue(gameState, currentDepth, agentNumber):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
         return (self.evaluationFunction(gameState), Directions.NORTH)
         
-      v = (float("-inf"), Directions.NORTH)
+      largestValue = float("-inf")
+      bestAction = Directions.NORTH
+      agentNumber = (agentNumber + 1) % gameState.getNumAgents()
       for action in gameState.getLegalActions(0):
         successor = gameState.generateSuccessor(0, action)
-        successorValue = MinValue(successor, currentDepth + 1)[0]
-        
-        stri = 'MaxValue'
-        for i in range(0,currentDepth):
-          stri += '\t'
-        print stri, action, successorValue
-        
-        if(successorValue > v[0]):
-          v = (successorValue, action)
-      print '\n\n'
-      return v
+        successorValue = MinValue(successor, currentDepth, agentNumber + 1)[0]
+        if(successorValue > largestValue):
+          largestValue = successorValue
+          bestAction = action
+      return (largestValue, bestAction)
       
-    def MinValue(gameState, currentDepth):
-      if currentDepth is self.depth:
+    def MinValue(gameState, currentDepth, agentNumber):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
         return (self.evaluationFunction(gameState), Directions.NORTH)
-        
-      v = (float("inf"), Directions.NORTH)
+      
+      smallestValue = float("inf")
+      bestAction = Directions.NORTH 
+      agentNumber = (agentNumber + 1) % gameState.getNumAgents()
       for action in gameState.getLegalActions(1):
         successor = gameState.generateSuccessor(1, action)
-        successorValue = MaxValue(successor, currentDepth + 1)[0]
-        
-        stri = 'MinValue'
-        for i in range(0,currentDepth):
-          stri += '\t'
-        print stri, action, successorValue
-        
-        if(successorValue < v[0]):
-          v = (successorValue, action)
-      print '\n\n'
-      return v
+        if not agentNumber is 0:
+          successorValue = MaxValue(successor, currentDepth + 1, agentNumber)[0]
+        else:
+          successorValue = MinValue(successor, currentDepth, agentNumber)[0]
+        if(successorValue < smallestValue):
+          smallestValue = successorValue
+          bestAction = action
+      return (smallestValue, bestAction)
       
-      
-    v = MaxValue(gameState, 0)
-    print 'pacman has decided to go ... ', v[1]
-    print 'the score was ... ', v[0]
-    if v[1] is Directions.STOP:
-      time.sleep(100000000)
- 
+    resultActionToTake = MaxValue(gameState, 0, 0)[1]
+    return resultActionToTake
 
-    return v[1]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
