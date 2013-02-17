@@ -167,32 +167,49 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns the total number of agents in the game
     """
     "*** YOUR CODE HERE ***"
+    import time
     #util.raiseNotDefined()  
-    def MaxValue(gameState, currentDepth):
+    def MaxValue(gameState, currentDepth, currentAgent):
+      print 'MAX VALUE called', gameState
       if currentDepth is self.depth:
-        return (self.evaluationFunction(gameState), Directions.STOP)
+        return (self.evaluationFunction(gameState), Directions.EAST)
       v = (float("-inf"), Directions.STOP)
-      currentAgent = currentDepth % gameState.getNumAgents()
+      #currentAgent = currentDepth % gameState.getNumAgents()
+      print 'actions are ', gameState.getLegalActions(currentAgent)
       for action in gameState.getLegalActions(currentAgent):
         successor = gameState.generateSuccessor(currentAgent, action)
-        v = (max(v[0], MinValue(successor, currentDepth + 1)[0]), action)
+        v = (max(v[0], MinValue(successor, currentDepth,1)[0]), action)
       return v
-    def MinValue(gameState, currentDepth):
+      
+    def MinValue(gameState, currentDepth, currentAgent):
+      print 'MIN VALUE called', gameState
       if currentDepth is self.depth:
-        return (self.evaluationFunction(gameState), Directions.STOP)
+        return (self.evaluationFunction(gameState), Directions.EAST)
       v = (float("inf"), Directions.STOP)
-      currentAgent = currentDepth % gameState.getNumAgents()
+      #currentAgent = currentDepth % gameState.getNumAgents()
+      print 'eval function', self.evaluationFunction(gameState)
+      print 'actions are ', gameState.getLegalActions(currentAgent)
       for action in gameState.getLegalActions(currentAgent):
         successor = gameState.generateSuccessor(currentAgent, action)
-        if currentAgent + 1 % gameState.getNumAgents() == 0:
-          v = (min(v[0], MaxValue(successor, currentDepth + 1)[0]), action)
+
+        print gameState.getNumAgents() , ' number of agents in the game'
+        print 'checking condition ', currentAgent  % gameState.getNumAgents() is 0
+        print '\t pt1 of condition ', currentAgent  % gameState.getNumAgents()
+        if currentAgent is gameState.getNumAgents()-1:
+          v = (min(v[0], MaxValue(successor, currentDepth+1, 0)[0]), action)
+          print 'pacman activated!'
         else:
-          v = (max(v[0], MinValue(successor, currentDepth + 1)[0]), action)
+          v = (min(v[0], MinValue(successor, currentDepth)[0],currentAgent+1), action)
+          print 'ghosts doing stuff'
       return v
       
       
-    listOfActions = gameState.getLegalActions(0)
-    v = MaxValue(gameState, 0)
+    v = MaxValue(gameState, 0, 0)
+    print 'pacman has decided to go ... ', v[1]
+    print 'the score was ... ', v[0]
+    #time.sleep(1000)
+ 
+
     return v[1]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
