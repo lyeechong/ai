@@ -168,30 +168,50 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     "*** YOUR CODE HERE ***"
     import time
-    #util.raiseNotDefined()  
-    def MaxValue(gameState, currentDepth, currentAgent):
+    def MaxValue(gameState, currentDepth):
       if currentDepth is self.depth:
-        return (self.evaluationFunction(gameState), Directions.EAST)
-      v = (float("-inf"), Directions.STOP)
-      for action in gameState.getLegalActions(currentAgent):
-        successor = gameState.generateSuccessor(currentAgent, action)
-        v = (max(v[0], MinValue(successor, currentDepth, 1)[0]), action)
+        return (self.evaluationFunction(gameState), Directions.NORTH)
+        
+      v = (float("-inf"), Directions.NORTH)
+      for action in gameState.getLegalActions(0):
+        successor = gameState.generateSuccessor(0, action)
+        successorValue = MinValue(successor, currentDepth + 1)[0]
+        
+        stri = 'MaxValue'
+        for i in range(0,currentDepth):
+          stri += '\t'
+        print stri, action, successorValue
+        
+        if(successorValue > v[0]):
+          v = (successorValue, action)
+      print '\n\n'
       return v
       
-    def MinValue(gameState, currentDepth, currentAgent):
+    def MinValue(gameState, currentDepth):
       if currentDepth is self.depth:
-        return (self.evaluationFunction(gameState), Directions.EAST)
-      v = (float("inf"), Directions.STOP)
-      for action in gameState.getLegalActions(currentAgent):
-        successor = gameState.generateSuccessor(currentAgent, action)
-        v = (min(v[0], MaxValue(successor, currentDepth)[0], currentAgent + 1), action)
+        return (self.evaluationFunction(gameState), Directions.NORTH)
+        
+      v = (float("inf"), Directions.NORTH)
+      for action in gameState.getLegalActions(1):
+        successor = gameState.generateSuccessor(1, action)
+        successorValue = MaxValue(successor, currentDepth + 1)[0]
+        
+        stri = 'MinValue'
+        for i in range(0,currentDepth):
+          stri += '\t'
+        print stri, action, successorValue
+        
+        if(successorValue < v[0]):
+          v = (successorValue, action)
+      print '\n\n'
       return v
       
       
-    v = MaxValue(gameState, 0, 0)
+    v = MaxValue(gameState, 0)
     print 'pacman has decided to go ... ', v[1]
     print 'the score was ... ', v[0]
-    #time.sleep(1000)
+    if v[1] is Directions.STOP:
+      time.sleep(100000000)
  
 
     return v[1]
