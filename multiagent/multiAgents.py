@@ -270,7 +270,39 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       legal moves.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    def MaxValue(gameState, currentDepth, agentNumber):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+        return (self.evaluationFunction(gameState), Directions.NORTH)
+        
+      largestValue = float("-inf")
+      bestAction = Directions.NORTH
+      for action in gameState.getLegalActions(agentNumber):
+        successor = gameState.generateSuccessor(agentNumber, action)
+        successorValue = ExpValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
+        if(successorValue > largestValue):
+          largestValue = successorValue
+          bestAction = action
+      return (largestValue, bestAction)
+      
+    def ExpValue(gameState, currentDepth, agentNumber):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+        return (self.evaluationFunction(gameState), Directions.NORTH)
+      
+      totalValue = 0
+      legalActions = gameState.getLegalActions(agentNumber)
+      for action in legalActions:
+        successor = gameState.generateSuccessor(agentNumber, action)
+        nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
+        if not agentNumber is 0:
+          successorValue = MaxValue(successor, currentDepth + 1, nextAgentNumber)[0]
+        else:
+          successorValue = ExpValue(successor, currentDepth, nextAgentNumber)[0]
+        totalValue += successorValue
+      return (totalValue/len(legalActions), Directions.STOP)
+      
+    resultActionToTake = MaxValue(gameState, 0, 0)[1]
+    return resultActionToTake
 
 def betterEvaluationFunction(currentGameState):
   """
