@@ -176,10 +176,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
       largestValue = float("-inf")
       bestAction = Directions.NORTH
-      agentNumber = (agentNumber + 1) % gameState.getNumAgents()
-      for action in gameState.getLegalActions(0):
-        successor = gameState.generateSuccessor(0, action)
-        successorValue = MinValue(successor, currentDepth, agentNumber + 1)[0]
+      for action in gameState.getLegalActions(agentNumber):
+        successor = gameState.generateSuccessor(agentNumber, action)
+        successorValue = MinValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
         if(successorValue > largestValue):
           largestValue = successorValue
           bestAction = action
@@ -191,13 +190,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
       
       smallestValue = float("inf")
       bestAction = Directions.NORTH 
-      agentNumber = (agentNumber + 1) % gameState.getNumAgents()
-      for action in gameState.getLegalActions(1):
-        successor = gameState.generateSuccessor(1, action)
+      for action in gameState.getLegalActions(agentNumber):
+        successor = gameState.generateSuccessor(agentNumber, action)
         if not agentNumber is 0:
-          successorValue = MaxValue(successor, currentDepth + 1, agentNumber)[0]
+          successorValue = MaxValue(successor, currentDepth + 1, (agentNumber + 1) % gameState.getNumAgents())[0]
         else:
-          successorValue = MinValue(successor, currentDepth, agentNumber)[0]
+          successorValue = MinValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
         if(successorValue < smallestValue):
           smallestValue = successorValue
           bestAction = action
