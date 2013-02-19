@@ -166,7 +166,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     "*** YOUR CODE HERE ***"
 
     def MaxValue(gameState, currentDepth, agentNumber):
-      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+      if currentDepth is self.depth:# or gameState.isWin() or gameState.isLose():
         return (self.evaluationFunction(gameState), Directions.NORTH)
         
       largestValue = float("-inf")
@@ -180,7 +180,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
       return (largestValue, bestAction)
       
     def MinValue(gameState, currentDepth, agentNumber):
-      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+      if currentDepth is self.depth: #or gameState.isWin() or gameState.isLose():
         return (self.evaluationFunction(gameState), Directions.NORTH)
       
       smallestValue = float("inf")
@@ -196,8 +196,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
           smallestValue = successorValue
           bestAction = action
       return (smallestValue, bestAction)
-      
-    resultActionToTake = MaxValue(gameState, 0, 0)[1]
+
+    result = MaxValue(gameState, 0, 0)
+    resultActionToTake = result[1]
+    print 'Minimax value for dept ', self.depth,' ',result[0]
     return resultActionToTake
 
 
