@@ -166,12 +166,17 @@ class MinimaxAgent(MultiAgentSearchAgent):
     "*** YOUR CODE HERE ***"
 
     def MaxValue(gameState, currentDepth, agentNumber):
-      if currentDepth is self.depth:# or gameState.isWin() or gameState.isLose():
+       
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+    
+        print 'evaluation function at leaf ',self.evaluationFunction(gameState)
         return (self.evaluationFunction(gameState), Directions.NORTH)
+      print 'depth ',currentDepth
         
       largestValue = float("-inf")
       bestAction = Directions.NORTH
       for action in gameState.getLegalActions(agentNumber):
+        print 'analyzing ',action,' for pacman ',agentNumber
         successor = gameState.generateSuccessor(agentNumber, action)
         successorValue = MinValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
         if(successorValue > largestValue):
@@ -180,15 +185,19 @@ class MinimaxAgent(MultiAgentSearchAgent):
       return (largestValue, bestAction)
       
     def MinValue(gameState, currentDepth, agentNumber):
-      if currentDepth is self.depth: #or gameState.isWin() or gameState.isLose():
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+        print 'evaluation function at leaf ',self.evaluationFunction(gameState)
         return (self.evaluationFunction(gameState), Directions.NORTH)
+       
+      print 'depth ',currentDepth
       
       smallestValue = float("inf")
       bestAction = Directions.NORTH 
       for action in gameState.getLegalActions(agentNumber):
+        print 'analyzing ',action,' for ghost ',agentNumber
         successor = gameState.generateSuccessor(agentNumber, action)
         nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
-        if not agentNumber is 0:
+        if nextAgentNumber is 0:
           successorValue = MaxValue(successor, currentDepth + 1, nextAgentNumber)[0]
         else:
           successorValue = MinValue(successor, currentDepth, nextAgentNumber)[0]
@@ -199,7 +208,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     result = MaxValue(gameState, 0, 0)
     resultActionToTake = result[1]
-    print 'Minimax value for dept ', self.depth,' ',result[0]
+    print 'Minimax value for depth ', self.depth,' ',result[0]
+    import time
+    time.sleep(1000000)
     return resultActionToTake
 
 
