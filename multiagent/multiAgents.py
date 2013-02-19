@@ -355,7 +355,7 @@ def betterEvaluationFunction(currentGameState):
         #mm... before running, check to see if there's a nearby power pellet...
         if pacmanPosition in capsulePositions:
           #is pacman on a power pellet? how convenient!
-          score += 80000
+          score += 800000
           
         noNearbyPellets = True
         for pellet in capsulePositions:
@@ -374,7 +374,7 @@ def betterEvaluationFunction(currentGameState):
             if ghostDistanceToPacman < 3:
               score -= 4000/ghostDistanceToPacman
             else:
-              score -= 2000/ghostDistanceToPacman
+              score -= 1000/ghostDistanceToPacman
             
     #otherwise the ghost is not near pacman
     elif ghostDistanceToPacman < 4:
