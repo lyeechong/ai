@@ -278,6 +278,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       largestValue = float("-inf")
       bestAction = Directions.NORTH
       for action in gameState.getLegalActions(agentNumber):
+        if action is Directions.STOP:
+          continue
         successor = gameState.generateSuccessor(agentNumber, action)
         successorValue = ExpValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
         if(successorValue > largestValue):
@@ -313,52 +315,100 @@ def betterEvaluationFunction(currentGameState):
   """
   "*** YOUR CODE HERE ***"
 
-  successorGameState = currentGameState.generatePacmanSuccessor(action)
-  newPos = successorGameState.getPacmanPosition()
+  pacmanPosition = currentGameState.getPacmanPosition()
   oldFood = currentGameState.getFood()
-  newGhostStates = successorGameState.getGhostStates()
-  newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+  newGhostStates = currentGameState.getGhostStates()
+  capsulePositions = currentGameState.getCapsules()
 
+  #start off with 10000 points
   score = 10000
   
-  if successorGameState.isWin():
+  if currentGameState.isWin():
     #yay, we win!
     return float("inf")
-  if successorGameState.isLose():
+  if currentGameState.isLose():
+    #please don't lose!
     return float("-inf")
     
   for ghost in newGhostStates:
-    ghostPos = ghost.getPosition()
-    if util.manhattanDistance(ghostPos, newPos) < 2:
-      capsuleplaces = currentGameState.getCapsules()
-      if successorGameState.getPacmanPosition() in capsuleplaces:
-        score += 5
-      score -= 10000
+    ghostPosition = ghost.getPosition()
+    ghostScareTimer = ghost.scaredTimer
+    ghostDistanceToPacman = util.manhattanDistance(ghostPosition, pacmanPosition)
+    
+    #if the ghost is near pacman...
+    if ghostDistanceToPacman < 4:
+      #check to see if the ghost is scared
+      if ghostScareTimer >= ghostDistanceToPacman:
       
-    else:
-      score += util.manhattanDistance(ghostPos, newPos) * 1
+        #if the ghost will be scared long enough for pacman to eat it, chase
+        #this will reward pacman for being closer to the scared ghost
+        
+        if ghostDistanceToPacman is 0:
+          #right ontop of the ghost, lots of points!
+          #KILL IT WITH FIRE
+          score += 100000000000000000000000000000000000000000000000
+        else:
+          score += 8000/ghostDistanceToPacman
+          
+      else:
+        #the ghost is either scared but too far, or not scared
+        #mm... before running, check to see if there's a nearby power pellet...
+        if pacmanPosition in capsulePositions:
+          #is pacman on a power pellet? how convenient!
+          score += 80000
+          
+        noNearbyPellets = True
+        for pellet in capsulePositions:
+          pelletDistanceToPacman = util.manhattanDistance(pellet, pacmanPosition)
+          if ghostDistanceToPacman >= pelletDistanceToPacman:
+            #the ghost is further away from this pellet
+            #head to the pellet!
+            score += 80000/pelletDistanceToPacman
+          
+        if noNearbyPellets:
+          #there's no nearby power pellets... run!
+          if ghostDistanceToPacman is 0:
+            #y'know... dying is bad...
+            score -= 10000000000000000000000000000000000000000
+          else:
+            if ghostDistanceToPacman < 3:
+              score -= 4000/ghostDistanceToPacman
+            else:
+              score -= 2000/ghostDistanceToPacman
+            
+    #otherwise the ghost is not near pacman
+    elif ghostDistanceToPacman < 4:
+      #add the distance to the ghost (reward pacman for staying away from ghosts)
+      score += ghostDistanceToPacman * 10
+        
+  #look for the nearest food pellet (which is not at pacman's location) and the furthest
+  nearestFoodDistance = 0
+  furthestFoodDistance = 0
+  for foodPosition in oldFood.asList():
+    foodDistanceToPacman = util.manhattanDistance(foodPosition, pacmanPosition)
+    if foodDistanceToPacman is 0:
+      #pacman is on some food, reward him!
+      score += 5000
+      continue
+    if (foodDistanceToPacman < nearestFoodDistance):
+      nearestFoodDistance = foodDistanceToPacman
+    if (foodDistanceToPacman > furthestFoodDistance):
+      furthestFoodDistance = foodDistanceToPacman
       
-  nearFood = 1000
-  farFood = 1000
-  for foodPos in oldFood.asList():
-    dist = util.manhattanDistance(foodPos, newPos)
-    if (dist < nearFood):
-      nearFood = dist
-    if (dist > farFood):
-      farFood = dist
-  if (currentGameState.getNumFood() < successorGameState.getNumFood()):
-    score += 5
-
-  if action == Directions.WEST:
-    score -= 1
-  if action == Directions.STOP:
-    score -= 2
-      
-
-  score -= 2 * farFood
-  score -= 5 * nearFood
+  #penalty for food being far away
+  score += 50 * furthestFoodDistance
   
-  return max(score, 0)
+  #reward for food being close
+  if len(oldFood.asList()) < 5:
+    #almost done! more reward for food!
+    score -= 2500 * nearestFoodDistance
+  else:
+    score -= 1000 * nearestFoodDistance
+  
+  score -= 2000 * len(oldFood.asList())
+  #score -= 30 * len(capsulePositions)
+  
+  return score
 
 # Abbreviation
 better = betterEvaluationFunction
