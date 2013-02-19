@@ -169,14 +169,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
        
       if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
     
-        print 'evaluation function at leaf ',self.evaluationFunction(gameState)
+        #print 'evaluation function at leaf ',self.evaluationFunction(gameState)
         return (self.evaluationFunction(gameState), Directions.NORTH)
-      print 'depth ',currentDepth
+      #print 'depth ',currentDepth
         
       largestValue = float("-inf")
       bestAction = Directions.NORTH
       for action in gameState.getLegalActions(agentNumber):
-        print 'analyzing ',action,' for pacman ',agentNumber
+        #print 'analyzing ',action,' for pacman ',agentNumber
         successor = gameState.generateSuccessor(agentNumber, action)
         successorValue = MinValue(successor, currentDepth, (agentNumber + 1) % gameState.getNumAgents())[0]
         if(successorValue > largestValue):
@@ -186,15 +186,15 @@ class MinimaxAgent(MultiAgentSearchAgent):
       
     def MinValue(gameState, currentDepth, agentNumber):
       if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
-        print 'evaluation function at leaf ',self.evaluationFunction(gameState)
+        #print 'evaluation function at leaf ',self.evaluationFunction(gameState)
         return (self.evaluationFunction(gameState), Directions.NORTH)
        
-      print 'depth ',currentDepth
+      #print 'depth ',currentDepth
       
       smallestValue = float("inf")
       bestAction = Directions.NORTH 
       for action in gameState.getLegalActions(agentNumber):
-        print 'analyzing ',action,' for ghost ',agentNumber
+        #print 'analyzing ',action,' for ghost ',agentNumber
         successor = gameState.generateSuccessor(agentNumber, action)
         nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
         if nextAgentNumber is 0:
@@ -208,9 +208,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     result = MaxValue(gameState, 0, 0)
     resultActionToTake = result[1]
-    print 'Minimax value for depth ', self.depth,' ',result[0]
-    import time
-    time.sleep(1000000)
+    #print 'Minimax value for depth ', self.depth,' ',result[0]
+    #import time
+    #time.sleep(1000000)
     return resultActionToTake
 
 
@@ -252,7 +252,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       for action in gameState.getLegalActions(agentNumber):
         successor = gameState.generateSuccessor(agentNumber, action)
         nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
-        if not agentNumber is 0:
+        if nextAgentNumber is 0:
           successorValue = MaxValue(successor, currentDepth + 1, nextAgentNumber, alpha, beta)[0]
         else:
           successorValue = MinValue(successor, currentDepth, nextAgentNumber, alpha, beta)[0]
@@ -266,7 +266,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     alpha = float("-inf")
     beta = float("inf")      
-    resultActionToTake = MaxValue(gameState, 0, 0, alpha, beta)[1]
+    result=MaxValue(gameState, 0, 0, alpha, beta)
+    resultActionToTake = result[1]
+    #import time
+    #print 'AlphaBeta value for depth ', self.depth,' ',result[0]
+    #time.sleep(1000)
     return resultActionToTake
 
 
@@ -309,14 +313,18 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       for action in legalActions:
         successor = gameState.generateSuccessor(agentNumber, action)
         nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
-        if not agentNumber is 0:
+        if nextAgentNumber is 0:
           successorValue = MaxValue(successor, currentDepth + 1, nextAgentNumber)[0]
         else:
           successorValue = ExpValue(successor, currentDepth, nextAgentNumber)[0]
         totalValue += successorValue
       return (totalValue/len(legalActions), Directions.STOP)
       
-    resultActionToTake = MaxValue(gameState, 0, 0)[1]
+    result= MaxValue(gameState, 0, 0)
+    resultActionToTake =result[1]
+    #print 'AlphaBeta value for depth ', self.depth,' ',result[0]
+    #import time
+    #time.sleep(10000)
     return resultActionToTake
 
 def betterEvaluationFunction(currentGameState):
