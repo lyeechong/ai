@@ -349,6 +349,59 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    
+    
+    ---------------- OUR DESCRIPTION HERE! ---------------- 
+    
+    First off, our code used a linear addition scorer to figure out the
+    utility of the gameState, and we used mutipliers based on the
+    value of a feature in the state (example, food was good).
+    
+    Our code made it so that dying was considered bad and had a high negative score.
+    We then based all our other values on the dying score.
+    
+    We valued winning, but we did not make it a really high number since
+    you could easily grab more points via eating ghosts first before winning, and
+    we took that into account.
+    
+    When pacman encountered a ghost, we took into consideration the number of ghosts nearby
+    and the state of the ghosts.
+    
+    If the ghost was scared, and the scared timer was greater than the distance pacman is to the
+    ghost, we would increase the score the closer pacman got to it (try and eat it).
+    
+    If the ghosts nearby were not scared, we would check to see the distance of the nearest
+    power-pellet, and see if we could reach it before the ghost reached us, if so, head for the pellet
+    (then go eat the ghosts).
+    
+    If there were no pellets, and the ghosts nearby were not scared, our logic depended on the number of
+    ghosts.
+       If there is one ghost, we would simply not go into its square, as pacman can easily dodge a
+        single ghost all day since he gets the first move.
+       If there is more than one ghost nearby, pacman would avoid them, being penalized for
+        being too close.
+    
+    For food, we would just head to the nearest food.
+    
+    If we saw our score was less than 500 and we were going to lose, we made it so that pacman would
+    try and stay alive instead of suiciding as we found most of the time pacman could have made it out
+    alive.
+    
+    We had plenty of issues with pacman thrashing around and we never really completely solved it, but
+    we managed to mitigate most of the problem by using the ghosts' positons to randomize pacman's actions.
+    We also made it so that pacman would favor going South and West over North and East to help him get
+    unstuck.
+    
+    We made it so that eating capsules and food added to the score.
+    
+    We also used the in-game score method < currentGameState.getScore() > as the main component of our
+    scoring method, and our actual score just being used mainly to break ties.
+    
+    It works pretty well and four out of five times we get an average score greater than 1000.
+    
+    ---------------- END OUR DESCRIPTION HERE ---------------- 
+    
+    
   """
   "*** YOUR CODE HERE ***"
   
@@ -421,7 +474,13 @@ def betterEvaluationFunction(currentGameState):
     for ghost in newGhostStates:
       ghostPosition = ghost.getPosition()
       ghostDistanceToPacman = util.manhattanDistance(ghostPosition, pacmanPosition)
-      score -= 1000000000/ghostDistanceToPacman
+      if ghostDistanceToPacman is 0:
+        score -= 1000000000
+      else:
+        if ghostDistanceToPacman is 0:
+          score -= 1000000000
+        else:
+          score -= 1000000000/(ghostDistanceToPacman+1)
     
   #look for the nearest food pellet (which is not at pacman's location) and the furthest
   nearestFoodDistance = float("inf")
@@ -467,107 +526,6 @@ def betterEvaluationFunction(currentGameState):
   
   return score
 
-  """
-  pacmanPosition = currentGameState.getPacmanPosition()
-  oldFood = currentGameState.getFood()
-  newGhostStates = currentGameState.getGhostStates()
-  capsulePositions = currentGameState.getCapsules()
-
-  #start off with 10000 points
-  score = 10000
-  
-  if currentGameState.isWin():
-    #yay, we win!
-    return float("inf")
-  if currentGameState.isLose():
-    #please don't lose!
-    return float("-inf")
-    
-  for ghost in newGhostStates:
-    ghostPosition = ghost.getPosition()
-    ghostScareTimer = ghost.scaredTimer
-    ghostDistanceToPacman = util.manhattanDistance(ghostPosition, pacmanPosition)
-    
-    #if the ghost is near pacman...
-    if ghostDistanceToPacman < 4:
-      #check to see if the ghost is scared
-      if ghostScareTimer >= ghostDistanceToPacman:
-      
-        #if the ghost will be scared long enough for pacman to eat it, chase
-        #this will reward pacman for being closer to the scared ghost
-        
-        if ghostDistanceToPacman is 0:
-          #right ontop of the ghost, lots of points!
-          #KILL IT WITH FIRE
-          score += 100000000000000000000000000000000000000000000000
-        else:
-          score += 8000/ghostDistanceToPacman
-          
-      else:
-        #the ghost is either scared but too far, or not scared
-        #mm... before running, check to see if there's a nearby power pellet...
-        if pacmanPosition in capsulePositions:
-          #is pacman on a power pellet? how convenient!
-          score += 800000
-          
-        noNearbyPellets = True
-        for pellet in capsulePositions:
-          pelletDistanceToPacman = util.manhattanDistance(pellet, pacmanPosition)
-          if ghostDistanceToPacman >= pelletDistanceToPacman:
-            #the ghost is further away from this pellet
-            #head to the pellet!
-            score += 80000/pelletDistanceToPacman
-          
-        if noNearbyPellets:
-          #there's no nearby power pellets... run!
-          if ghostDistanceToPacman is 0:
-            #y'know... dying is bad...
-            score -= 100000
-          else:
-            if ghostDistanceToPacman < 3:
-              score -= 400/ghostDistanceToPacman
-              score -= 0
-            else:
-              score -= 100/ghostDistanceToPacman
-
-            
-    #otherwise the ghost is not near pacman
-    elif ghostDistanceToPacman < 4:
-      #add the distance to the ghost (reward pacman for staying away from ghosts)
-      score += ghostDistanceToPacman * 10
-        
-  #look for the nearest food pellet (which is not at pacman's location) and the furthest
-  nearestFoodDistance = 0
-  furthestFoodDistance = 0
-  for foodPosition in oldFood.asList():
-    foodDistanceToPacman = util.manhattanDistance(foodPosition, pacmanPosition)
-    if foodDistanceToPacman is 0:
-      #pacman is on some food, reward him!
-      score += 5000
-      continue
-    if (foodDistanceToPacman < nearestFoodDistance):
-      nearestFoodDistance = foodDistanceToPacman
-    if (foodDistanceToPacman > furthestFoodDistance):
-      furthestFoodDistance = foodDistanceToPacman
-      
-  #penalty for food being far away
-  score += 50 * furthestFoodDistance
-  
-  #reward for food being close
-  if len(oldFood.asList()) < 5:
-    #almost done! more reward for food!
-    score -= 2500 * nearestFoodDistance
-  else:
-    score -= 1000 * nearestFoodDistance
-  
-  score -= 2000 * len(oldFood.asList())
-  #score -= 30 * len(capsulePositions)
-  
-  score += currentGameState.getScore() * 10000
-  
-  return score
-  """
-
 # Abbreviation
 better = betterEvaluationFunction
 
@@ -585,5 +543,186 @@ class ContestAgent(MultiAgentSearchAgent):
       just make a beeline straight towards Pacman (or away from him if they're scared!)
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def betterEvaluationFunction(currentGameState):
+      """
+        Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
+        evaluation function (question 5).
+
+        DESCRIPTION: <write something here so we know what you did>
+      
+      """
+      "*** YOUR CODE HERE ***"
+      
+      pacmanPosition = currentGameState.getPacmanPosition()
+      oldFood = currentGameState.getFood()
+      newGhostStates = currentGameState.getGhostStates()
+      capsulePositions = currentGameState.getCapsules()
+      
+      #print "current pacman position ", pacmanPosition
+
+      score = 0
+      
+      numGhostsNear = 0
+      numGhostsScared = 0
+      
+      if currentGameState.isLose():
+        score -= 1000000000
+      if currentGameState.isWin() and numGhostsScared is 0:
+        score += 100000000
+      
+      for ghost in newGhostStates: 
+        ghostScareTimer = ghost.scaredTimer
+        if ghostScareTimer > 2:
+          numGhostsScared += 1
+      
+      for ghost in newGhostStates:
+        ghostPosition = ghost.getPosition()
+        ghostScareTimer = ghost.scaredTimer
+        ghostDistanceToPacman = util.manhattanDistance(ghostPosition, pacmanPosition)
+            
+        #if the ghost is near pacman...
+        if ghostDistanceToPacman < 5:
+          #check to see if the ghost is scared
+          if ghostScareTimer >= ghostDistanceToPacman:
+          
+            #if the ghost will be scared long enough for pacman to eat it, chase
+            #this will reward pacman for being closer to the scared ghost
+            
+            if ghostDistanceToPacman is 0:
+              #right ontop of the ghost, lots of points!
+              #KILL IT WITH FIRE
+              score -= 1000000000000
+            else:
+              score -= 8000000/(ghostDistanceToPacman+1)
+              
+          else:
+            #the ghost is either scared but too far, or not scared
+            #mm... before running, check to see if there's a nearby power pellet...
+            if pacmanPosition in capsulePositions:
+              #is pacman on a power pellet? how convenient!
+              score += 200000
+              
+            noNearbyPellets = True
+            for pellet in capsulePositions:
+              pelletDistanceToPacman = util.manhattanDistance(pellet, pacmanPosition)
+              if ghostDistanceToPacman >= pelletDistanceToPacman:
+                #the ghost is further away from this pellet
+                #head to the pellet!
+                if pelletDistanceToPacman is 0:
+                  score += 100400
+                else:
+                  score += 100000/pelletDistanceToPacman
+            if noNearbyPellets:
+              if ghostDistanceToPacman < 4:
+                numGhostsNear += 1
+                
+        score += ghostPosition[0] * 1000 - ghostPosition[1] * 1500
+      
+      if numGhostsNear > 1:
+        for ghost in newGhostStates:
+          ghostPosition = ghost.getPosition()
+          ghostDistanceToPacman = util.manhattanDistance(ghostPosition, pacmanPosition)
+          if ghostDistanceToPacman is 0:
+            score -= 1000000000
+          else:
+            if ghostDistanceToPacman is 0:
+              score -= 1000000000
+            else:
+              score -= 1000000000/(ghostDistanceToPacman+1)
+        
+      #look for the nearest food pellet (which is not at pacman's location) and the furthest
+      nearestFoodDistance = float("inf")
+      
+      temp = oldFood.asList()
+      import random
+      #random.shuffle(temp)
+      temp.sort()
+      for foodPosition in temp:
+        foodDistanceToPacman = util.manhattanDistance(foodPosition, pacmanPosition)
+        #print foodPosition, pacmanPosition, foodDistanceToPacman
+        if foodDistanceToPacman is 0:
+          #pacman is on some food, reward him!
+          score += 20000
+          continue
+        if (foodDistanceToPacman < nearestFoodDistance) and (foodDistanceToPacman > 0):
+          nearestFoodDistance = foodDistanceToPacman
+      
+      score += 8000/abs(20-pacmanPosition[1]+1)
+      score += 8000/(pacmanPosition[0]+1)
+      
+      #print "nearestFoodDistance ", nearestFoodDistance
+      
+      import time
+      #time.sleep(1000)
+      temp = (100000 / nearestFoodDistance)
+      #print "AGHGHHGHGHGHGHGHGG ", temp
+      score += temp
+      
+      if currentGameState.getScore() < 500:
+        if currentGameState.isLose():
+          score -= 100000000000000000
+        
+      score += currentGameState.getScore()*1000000
+      
+      score -= 10000 * len(oldFood.asList())
+      score -= 50000 * len(capsulePositions)
+      
+      
+      #print score
+      
+      
+      
+      return score
+    def MaxValue(gameState, currentDepth, agentNumber, alpha, beta):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+        return (betterEvaluationFunction(gameState), Directions.NORTH)
+        
+      largestValue = float("-inf")
+      bestAction = Directions.NORTH
+      for action in gameState.getLegalActions(agentNumber):
+        if action is Directions.STOP:
+          continue
+        successor = gameState.generateSuccessor(agentNumber, action)
+        nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
+        successorValue = MinValue(successor, currentDepth, nextAgentNumber, alpha, beta)[0]
+        if(successorValue >= beta):
+          return (successorValue, action)
+        alpha = max(alpha, successorValue)
+        if(successorValue > largestValue):
+          largestValue = successorValue
+          bestAction = action
+      return (largestValue, bestAction)
+      
+    def MinValue(gameState, currentDepth, agentNumber, alpha, beta):
+      if currentDepth is self.depth or gameState.isWin() or gameState.isLose():
+        return (betterEvaluationFunction(gameState), Directions.NORTH)
+      
+      smallestValue = float("inf")
+      bestAction = Directions.NORTH 
+      for action in gameState.getLegalActions(agentNumber):
+        successor = gameState.generateSuccessor(agentNumber, action)
+        nextAgentNumber = (agentNumber + 1) % gameState.getNumAgents()
+        if nextAgentNumber is 0:
+          successorValue = MaxValue(successor, currentDepth + 1, nextAgentNumber, alpha, beta)[0]
+        else:
+          successorValue = MinValue(successor, currentDepth, nextAgentNumber, alpha, beta)[0]
+        if(successorValue <= alpha):
+          return (successorValue, action)
+        beta = min(beta, successorValue)
+        if(successorValue < smallestValue):
+          smallestValue = successorValue
+          bestAction = action
+      return (smallestValue, bestAction)
+
+    alpha = float("-inf")
+    beta = float("inf")      
+    result=MaxValue(gameState, 0, 0, alpha, beta)
+    resultActionToTake = result[1]
+    #import time
+    #print 'AlphaBeta value for depth ', self.depth,' ',result[0]
+    #time.sleep(1000)
+    return resultActionToTake
+    
+    
+    
 
