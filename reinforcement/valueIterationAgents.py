@@ -37,6 +37,23 @@ class ValueIterationAgent(ValueEstimationAgent):
     self.values = util.Counter() # A Counter is a dict with default 0
      
     "*** YOUR CODE HERE ***"
+    # OUR CODE HERE
+    #Note: I think we should use the util.Counter thing?
+    for times in range(0, iterations):
+      #values from previous iteration so we don't update over them while iterating
+      prevVals = self.values.copy()
+      #iterate through all states
+      for state in mdp.getStates():
+        #will store the action-value for the iteration
+        value = util.Counter()
+        for action in mdp.getPossibleActions(state):
+          for transitionState, probability in mdp.getTransitionStatesAndProbs(state, action):
+            #expected value, probability * reward for the state with the discount * reward
+            value[action] += probability * (mdp.getReward( state, action, transitionState) + discount * prevVals[transitionState])
+        #update the values to the new value from the iteration
+        #the .argMax() function returns the one with the largest value
+        self.values[state] = value[value.argMax()]
+    # END OUR CODE
     
   def getValue(self, state):
     """
@@ -54,7 +71,15 @@ class ValueIterationAgent(ValueEstimationAgent):
       to derive it on the fly.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # OUR CODE HERE
+    #get the value of the state
+    qVal = self.values[state]
+    #iterate through the MDP transition states from the current state
+    for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+      #q value = discount * expected value of reward of state
+      qVal += self.discount * probability * self.values[transitionState]
+    return qVal
+    # END OUR CODE
 
   def getPolicy(self, state):
     """
@@ -65,7 +90,41 @@ class ValueIterationAgent(ValueEstimationAgent):
       terminal state, you should return None.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # OUR CODE HERE
+    possibleActions = self.mdp.getPossibleActions(state)
+    #checking for terminal state (no possible actions)
+    if len(possibleActions) is 0: 
+      return None
+      
+    #attempt at using the Counter
+    eValsActions = util.Counter()
+    for action in possibleActions:
+      for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+        eValsActions[action] += probability * (self.mdp.getReward( state, action, transitionState) + self.discount * self.values[transitionState])
+            
+    return eValsActions.argMax()
+      
+    #fail attempt using lists :(
+    """
+    #list to hold the expected value of the actions
+    eValsActions = []
+    #iterate through all actions and their transtion states
+    for action in possibleActions:
+      for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+        #expected value of reward with discount * the value of the transitions
+        eValsActions[action] += probability * (self.mdp.getReward( state, action, transitionState) + self.discount * self.values[transitionState])
+            
+    #now iterate through and find the action with the best value
+    #(that will be the best action)
+    maxVal = -float("inf")
+    bestAction = None
+    for action in possibleActions:
+      if eValsActions[action] > maxVal:
+        maxVal = eValsAction[action]
+        bestAction = action
+    """
+    return action
+    # END OUR CODE
 
   def getAction(self, state):
     "Returns the policy at the state (no exploration)."
