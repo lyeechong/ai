@@ -38,6 +38,11 @@ class QLearningAgent(ReinforcementAgent):
     ReinforcementAgent.__init__(self, **args)
 
     "*** YOUR CODE HERE ***"
+    #OUR CODE HERE
+    #So I guess we need to make a counter to stick Q values in
+    #Everything in it will be 0 because it's a counter
+    self.qvalues = util.Counter()
+    
   
   def getQValue(self, state, action):
     """
@@ -46,7 +51,9 @@ class QLearningAgent(ReinforcementAgent):
       a state or (state,action) tuple 
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #OUR CODE HERE
+    return self.qvalues[(state,action)]
+
   
     
   def getValue(self, state):
@@ -57,8 +64,18 @@ class QLearningAgent(ReinforcementAgent):
       terminal state, you should return a value of 0.0.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    
+    #OUR CODE HERE
+
+    #Okay, so in the instructions it has a hint that says we can't just
+    #use argmax because the "actual argmax you want may be a key not in
+    #the counter!". Not sure why that's the case or if it's relevant here
+    maximum = -sys.maxint-1
+    if self.getLegalActions(state) == None:
+      return 0.0
+    for action in self.getLegalActions(state):
+      maximum = max(maximum, self.qvalues[(state, action)])
+    return maximum
+
   def getPolicy(self, state):
     """
       Compute the best action to take in a state.  Note that if there
@@ -66,7 +83,24 @@ class QLearningAgent(ReinforcementAgent):
       you should return None.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #OUR CODE HERE
+    
+    #Again, the argmax warning scares me, so I just avoid argmax...
+
+    maximum = -sys.maxint-1
+    if self.getLegalActions(state)==None:
+      return None
+    bestAction = None
+    for action in self.getLegalActions(state):
+      if qvalue[(state,action)]==maximum:
+        #If there's a tie, apparently we choose the best action randomly
+        bestAction = random.choice(bestAction, action)
+      elif qvalue[(state,action)]>maximum:
+        maximum=qvalue[(state,action)]
+        bestAction = action
+    return bestAction
+    
+
     
   def getAction(self, state):
     """
@@ -83,8 +117,18 @@ class QLearningAgent(ReinforcementAgent):
     legalActions = self.getLegalActions(state)
     action = None
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    
+    #OUR CODE HERE
+
+    if legalActions==None:
+        return None
+
+    #So do we take a random action or not?
+    if util.flipCoin(self.epsilon):
+      #We will take a random action
+      action= random.choice(legalActions)
+    else:
+      #We follow the policy
+      action = getPolicy(state)
     return action
   
   def update(self, state, action, nextState, reward):
@@ -97,7 +141,8 @@ class QLearningAgent(ReinforcementAgent):
       it will be called on your behalf
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #We update the Q value. Straight from page 844 of the book. Not sure if I did R(s) or maxQ(s',a') correctly
+    self.qvalues[(state,action)]=self.qvalues[(state,action)]+self.alpha*(self.getValue(state)+self.gamma*self.getValue(nextState)-self.qvalues[(state,action)])
     
 class PacmanQAgent(QLearningAgent):
   "Exactly the same as QLearningAgent, but with different default parameters"
