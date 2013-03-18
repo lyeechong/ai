@@ -42,6 +42,7 @@ class QLearningAgent(ReinforcementAgent):
     #So I guess we need to make a counter to stick Q values in
     #Everything in it will be 0 because it's a counter
     self.qvalues = util.Counter()
+    #woohoo! counters!
     
   
   def getQValue(self, state, action):
@@ -52,7 +53,12 @@ class QLearningAgent(ReinforcementAgent):
     """
     "*** YOUR CODE HERE ***"
     #OUR CODE HERE
-    return self.qvalues[(state,action)]
+    #note to kendall: added a quick if check to see if it has been seen
+    #since it says so in the comments above
+    if (state, action) in self.qvalues:
+      return self.qvalues[(state,action)]
+    else:
+      return 0.0
 
   
     
@@ -69,12 +75,16 @@ class QLearningAgent(ReinforcementAgent):
     #Okay, so in the instructions it has a hint that says we can't just
     #use argmax because the "actual argmax you want may be a key not in
     #the counter!". Not sure why that's the case or if it's relevant here
-    maximum = -sys.maxint-1
+    
+    #maximum = -sys.maxint-1 #old kendall code
+    #maximum = -float("inf") #new lyee code!
+    maximum = 0.0 #newerrrr lyee code
     if self.getLegalActions(state) == None:
       return 0.0
     for action in self.getLegalActions(state):
       maximum = max(maximum, self.qvalues[(state, action)])
     return maximum
+    #lyee says: i think this code looks good
 
   def getPolicy(self, state):
     """
@@ -87,18 +97,23 @@ class QLearningAgent(ReinforcementAgent):
     
     #Again, the argmax warning scares me, so I just avoid argmax...
 
-    maximum = -sys.maxint-1
+    maximum = -sys.maxint-1 #old kendall code
+    #maximum = -float("inf") #new lyee code!
     if self.getLegalActions(state)==None:
       return None
     bestAction = None
     for action in self.getLegalActions(state):
-      if qvalue[(state,action)]==maximum:
+      if self.qvalues[(state,action)]==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
         #If there's a tie, apparently we choose the best action randomly
-        bestAction = random.choice(bestAction, action)
-      elif qvalue[(state,action)]>maximum:
-        maximum=qvalue[(state,action)]
+        bestAction = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
+      elif self.qvalues[(state,action)]>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
+        maximum=self.qvalues[(state,action)]#Lyee fix: I think you meant self.qvalues instead of qvalue
         bestAction = action
     return bestAction
+    #lyee says: ehhh looks okay I suppose!
+    #mmm... side note thought: wouldn't the best action just be the action
+    #with the q-value returned from when we do self.getValue(state) then we
+    #can easily check if the action has that value, it's the best action?
     
 
     
@@ -123,12 +138,12 @@ class QLearningAgent(ReinforcementAgent):
         return None
 
     #So do we take a random action or not?
-    if util.flipCoin(self.epsilon):
+    if util.flipCoin(self.epsilon): #lyee says: no idea what epsilon is!
       #We will take a random action
       action= random.choice(legalActions)
     else:
       #We follow the policy
-      action = getPolicy(state)
+      action = self.getPolicy(state) #lyee fix: kendall previously had just getPolicy.. I added the 'self' part. hope that's what kendall meant D:
     return action
   
   def update(self, state, action, nextState, reward):
@@ -142,7 +157,28 @@ class QLearningAgent(ReinforcementAgent):
     """
     "*** YOUR CODE HERE ***"
     #We update the Q value. Straight from page 844 of the book. Not sure if I did R(s) or maxQ(s',a') correctly
-    self.qvalues[(state,action)]=self.qvalues[(state,action)]+self.alpha*(self.getValue(state)+self.gamma*self.getValue(nextState)-self.qvalues[(state,action)])
+    
+    #lyee says: the pdf book code is a bit missing, so I whipped out my physical 2nd ed. copy
+    #and somewhat rewrote the equation
+    # Equation is:
+    # Q[a, s] = Q[a, s] + alpha * (N[s, a]) * (r + gamma * Q[a', s'] - Q[a, s])
+    
+    Q = self.qvalues[(state, action)]
+    a = self.alpha
+    y = self.gamma
+    r = reward
+    n = self.getValue(nextState)
+    self.qvalues[(state, action)] = Q+a*(r+y*n-Q) #btw, left out N[s, a] from the equation...
+    
+    #below here, lies old Kendall code
+    #RIP until needed
+    """
+    self.qvalues[(state,action)] = \
+    self.qvalues[(state,action)] + \
+    self.alpha * (self.getValue(state) + \ #old kendall code
+    self.gamma * self.getValue(nextState) - \
+    self.qvalues[(state,action)])
+    """
     
 class PacmanQAgent(QLearningAgent):
   "Exactly the same as QLearningAgent, but with different default parameters"
