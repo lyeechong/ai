@@ -168,7 +168,7 @@ class QLearningAgent(ReinforcementAgent):
     y = self.gamma
     r = reward
     n = self.getValue(nextState)
-    #:Dself.qvalues[(state, action)] = Q+a*(r+y*n-Q) #btw, left out N[s, a] from the equation...
+    self.qvalues[(state, action)] = Q+a*(r+y*n-Q) #btw, left out N[s, a] from the equation...
     
     #below here, lies old Kendall code
     #RIP until needed
