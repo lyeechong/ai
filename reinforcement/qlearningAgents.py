@@ -76,10 +76,10 @@ class QLearningAgent(ReinforcementAgent):
     #use argmax because the "actual argmax you want may be a key not in
     #the counter!". Not sure why that's the case or if it's relevant here
     
-    #maximum = -sys.maxint-1 #old kendall code
+    maximum = -sys.maxint-1 #old kendall code
     #maximum = -float("inf") #new lyee code!
-    maximum = 0.0 #newerrrr lyee code
-    if self.getLegalActions(state) == None:
+    #maximum = 0.0 #newerrrr lyee code
+    if self.getLegalActions(state) == None or len(self.getLegalActions(state)) is 0:
       return 0.0
     for action in self.getLegalActions(state):
       maximum = max(maximum, self.qvalues[(state, action)])
@@ -99,17 +99,17 @@ class QLearningAgent(ReinforcementAgent):
 
     maximum = -sys.maxint-1 #old kendall code
     #maximum = -float("inf") #new lyee code!
-    if self.getLegalActions(state)==None:
+    if self.getLegalActions(state)==None or len(self.getLegalActions(state)) is 0:
       return None
-    bestAction = None
+    bestAction = []
     for action in self.getLegalActions(state):
       if self.qvalues[(state,action)]==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
         #If there's a tie, apparently we choose the best action randomly
-        bestAction = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
+        bestAction.append(action)# = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
       elif self.qvalues[(state,action)]>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
         maximum=self.qvalues[(state,action)]#Lyee fix: I think you meant self.qvalues instead of qvalue
-        bestAction = action
-    return bestAction
+        bestAction = [action]
+    return random.choice(bestAction)
     #lyee says: ehhh looks okay I suppose!
     #mmm... side note thought: wouldn't the best action just be the action
     #with the q-value returned from when we do self.getValue(state) then we
@@ -134,7 +134,7 @@ class QLearningAgent(ReinforcementAgent):
     "*** YOUR CODE HERE ***"
     #OUR CODE HERE
 
-    if legalActions==None:
+    if legalActions==None or len(legalActions) is 0:
         return None
 
     #So do we take a random action or not?
@@ -168,7 +168,7 @@ class QLearningAgent(ReinforcementAgent):
     y = self.gamma
     r = reward
     n = self.getValue(nextState)
-    self.qvalues[(state, action)] = Q+a*(r+y*n-Q) #btw, left out N[s, a] from the equation...
+    #:Dself.qvalues[(state, action)] = Q+a*(r+y*n-Q) #btw, left out N[s, a] from the equation...
     
     #below here, lies old Kendall code
     #RIP until needed
