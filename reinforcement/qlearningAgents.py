@@ -82,7 +82,7 @@ class QLearningAgent(ReinforcementAgent):
     if self.getLegalActions(state) == None or len(self.getLegalActions(state)) is 0:
       return 0.0
     for action in self.getLegalActions(state):
-      maximum = max(maximum, self.qvalues[(state, action)])
+      maximum = max(maximum, self.getQValue(state, action))
     return maximum
     #lyee says: i think this code looks good
 
@@ -103,11 +103,11 @@ class QLearningAgent(ReinforcementAgent):
       return None
     bestAction = []
     for action in self.getLegalActions(state):
-      if self.qvalues[(state,action)]==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
+      if self.getQValue(state,action)==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
         #If there's a tie, apparently we choose the best action randomly
         bestAction.append(action)# = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
-      elif self.qvalues[(state,action)]>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
-        maximum=self.qvalues[(state,action)]#Lyee fix: I think you meant self.qvalues instead of qvalue
+      elif self.getQValue(state,action)>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
+        maximum=self.getQValue(state,action)#Lyee fix: I think you meant self.qvalues instead of qvalue
         bestAction = [action]
     return random.choice(bestAction)
     #lyee says: ehhh looks okay I suppose!
@@ -163,7 +163,7 @@ class QLearningAgent(ReinforcementAgent):
     # Equation is:
     # Q[a, s] = Q[a, s] + alpha * (N[s, a]) * (r + gamma * Q[a', s'] - Q[a, s])
     
-    Q = self.qvalues[(state, action)]
+    Q = self.getQValue(state,action) 
     a = self.alpha
     y = self.gamma
     r = reward
