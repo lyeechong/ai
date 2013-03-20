@@ -1,5 +1,5 @@
 lsc568, lyeechong@gmail.com
-ksa???, kendallemailhere
+ksa435, kendall.ahrendsen@utexas.edu
 
 Lyee Chong and Kendall Ahrendsen's submission for the
 CS378H: Reinforcement Learning Assignment
