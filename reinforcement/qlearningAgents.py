@@ -76,13 +76,13 @@ class QLearningAgent(ReinforcementAgent):
     #use argmax because the "actual argmax you want may be a key not in
     #the counter!". Not sure why that's the case or if it's relevant here
     
-    #maximum = -sys.maxint-1 #old kendall code
+    maximum = -sys.maxint-1 #old kendall code
     #maximum = -float("inf") #new lyee code!
-    maximum = 0.0 #newerrrr lyee code
-    if self.getLegalActions(state) == None:
+    #maximum = 0.0 #newerrrr lyee code
+    if self.getLegalActions(state) == None or len(self.getLegalActions(state)) is 0:
       return 0.0
     for action in self.getLegalActions(state):
-      maximum = max(maximum, self.qvalues[(state, action)])
+      maximum = max(maximum, self.getQValue(state, action))
     return maximum
     #lyee says: i think this code looks good
 
@@ -99,17 +99,17 @@ class QLearningAgent(ReinforcementAgent):
 
     maximum = -sys.maxint-1 #old kendall code
     #maximum = -float("inf") #new lyee code!
-    if self.getLegalActions(state)==None:
+    if self.getLegalActions(state)==None or len(self.getLegalActions(state)) is 0:
       return None
-    bestAction = None
+    bestAction = []
     for action in self.getLegalActions(state):
-      if self.qvalues[(state,action)]==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
+      if self.getQValue(state,action)==maximum: #Lyee fix: I think you meant self.qvalues instead of qvalue
         #If there's a tie, apparently we choose the best action randomly
-        bestAction = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
-      elif self.qvalues[(state,action)]>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
-        maximum=self.qvalues[(state,action)]#Lyee fix: I think you meant self.qvalues instead of qvalue
-        bestAction = action
-    return bestAction
+        bestAction.append(action)# = random.choice((bestAction, action)) #lyee fix: changed it into a tuple instead of 2 args
+      elif self.getQValue(state,action)>maximum:#Lyee fix: I think you meant self.qvalues instead of qvalue
+        maximum=self.getQValue(state,action)#Lyee fix: I think you meant self.qvalues instead of qvalue
+        bestAction = [action]
+    return random.choice(bestAction)
     #lyee says: ehhh looks okay I suppose!
     #mmm... side note thought: wouldn't the best action just be the action
     #with the q-value returned from when we do self.getValue(state) then we
@@ -134,7 +134,7 @@ class QLearningAgent(ReinforcementAgent):
     "*** YOUR CODE HERE ***"
     #OUR CODE HERE
 
-    if legalActions==None:
+    if legalActions==None or len(legalActions) is 0:
         return None
 
     #So do we take a random action or not?
@@ -163,7 +163,7 @@ class QLearningAgent(ReinforcementAgent):
     # Equation is:
     # Q[a, s] = Q[a, s] + alpha * (N[s, a]) * (r + gamma * Q[a', s'] - Q[a, s])
     
-    Q = self.qvalues[(state, action)]
+    Q = self.getQValue(state,action) 
     a = self.alpha
     y = self.gamma
     r = reward
@@ -226,6 +226,7 @@ class ApproximateQAgent(PacmanQAgent):
 
     # You might want to initialize weights here.
     "*** YOUR CODE HERE ***"
+    self.weights = util.Counter()
     
   def getQValue(self, state, action):
     """
@@ -233,14 +234,47 @@ class ApproximateQAgent(PacmanQAgent):
       where * is the dotProduct operator
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #OUR CODE HERE
+    total = 0
+    
+    
+    for feature in self.featExtractor.getFeatures(state,action):
+      total+=self.featExtractor.getFeatures(state,action)[feature]*self.weights[feature]
+    return total
+    #util.raiseNotDefined()
     
   def update(self, state, action, nextState, reward):
     """
        Should update your weights based on transition  
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # OUR CODE HERE
+    # the algo is:
+    # w_i = w_i + alpha [correction] * f_i(s, a)
+    # correction = (reward(s, a) + gamma * V(s')) - Q(s, a)
+    r = reward    
+    a = self.alpha
+    y = self.gamma
+    Q = self.getQValue(state,action) 
+    n = self.getValue(nextState)
+    correction = r+y*n-Q
+    
+    for feature in self.featExtractor.getFeatures(state,action):
+      self.weights[feature]=self.weights[feature]+(a*(correction)*self.featExtractor.getFeatures(state,action)[feature])
+    
+    
+    
+    """
+    weights = self.featExctractor.getFeatures(state,action)
+    for feature in weights:
+      weights[feature]= weights[feature] + a*correction*feature
+    
+    self.qvalues[(state, action)] = Q + a*correction*f
+    """
+    
+    
+    
+    #util.raiseNotDefined()
     
   def final(self, state):
     "Called at the end of each game."
