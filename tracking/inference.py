@@ -111,15 +111,36 @@ class ExactInference(InferenceModule):
     pacmanPosition = gameState.getPacmanPosition()
     
     "*** YOUR CODE HERE ***"
+    
+    #their old code
+    """
     # Replace this code with a correct observation update
     allPossible = util.Counter()
     for p in self.legalPositions:
       trueDistance = util.manhattanDistance(p, pacmanPosition)
       if emissionModel[trueDistance] > 0: allPossible[p] = 1.0
     allPossible.normalize()
+    
         
     "*** YOUR CODE HERE ***"
     self.beliefs = allPossible
+    """
+    
+    #OUR CODE HERE
+    #lyee's attempt at code!
+    
+    allPossible = util.Counter()
+    for p in self.legalPositions:
+      trueDistance = util.manhattanDistance(p, pacmanPosition)
+      if emissionModel[trueDistance] > 0:
+        #noisy dist is the est manhattan dist to the ghost
+        if noisyDistance == None:
+          allPossible[p] = 1.0
+        else:
+          allPossible[p] = emissionModel[trueDistance] * self.beliefs[p]
+    allPossible.normalize()
+    self.beliefs = allPossible
+    #END OUR CODE HERE
     
   def elapseTime(self, gameState):
     """
