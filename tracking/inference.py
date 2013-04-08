@@ -162,6 +162,22 @@ class ExactInference(InferenceModule):
     """
     
     "*** YOUR CODE HERE ***"
+    #OUR CODE HERE
+
+    ct = util.Counter()
+
+    #go through all pos
+    for position in self.legalPositions:
+      #get the position distr for the position (by plaing the ghost there and quereying via the setGhostPosition)
+      #NOTE: not sure if we need to set the ghost back to it's original position... but idk how to get the rorignal positon of the ghost
+      newPositionDistribution = self.getPositionDistribution(self.setGhostPosition(gameState, position))
+      #update for each
+      for newPosition, probability in newPositionDistribution.items():
+        #exp val
+        ct[newPosition] += probability * self.beliefs[position]
+    #update beliefs
+    self.beliefs = ct
+    # END OUR CODE
 
   def getBeliefDistribution(self):
     return self.beliefs
