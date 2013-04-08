@@ -45,6 +45,15 @@ class BustersAgent:
 
   def chooseAction(self, gameState):
     "By default, a BustersAgent just stops.  This should be overridden."
+    
+    #OUR CODE HERE
+    for thing in self.ghostBeliefs:
+      print thing
+
+    return Directions.STOP
+    # END OUR CODE
+
+    #THEIR ORIGINAL LINE OF CODE BELOWW
     return Directions.STOP
 
 class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
