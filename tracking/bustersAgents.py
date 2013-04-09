@@ -50,6 +50,8 @@ class BustersAgent:
     for thing in self.ghostBeliefs:
       print thing
 
+    
+
     return Directions.STOP
     # END OUR CODE
 
@@ -103,4 +105,36 @@ class GreedyBustersAgent(BustersAgent):
     pacmanPosition = gameState.getPacmanPosition()
     legal = [a for a in gameState.getLegalPacmanActions() if a != Directions.STOP]
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    bestAction = None
+    bestDistanceOverall = float("inf")
+
+    for action in legal:
+      successorPosition = Actions.getSuccessor(pacmanPosition,action)
+      for i in range(1, gameState.getNumAgents()):
+        beliefs = self.ghostBeliefs[i-1]
+
+        if not gameState.getLivingGhosts()[i]:
+          #The ghost is not alive, so skip it
+          print "Ghost #",i," is dead."
+          continue
+        
+        bestProbabilityForThisGhost = -1
+        bestPositionForThisGhost = -1
+        #print beliefs
+        for position in beliefs:
+          #print position
+          import time
+          #time.sleep(1)
+          probability = beliefs[position]
+          if probability > bestProbabilityForThisGhost:
+              bestProbabilityForThisGhost = probability
+              bestPositionForThisGhost = position
+        
+        print "Best ghost location ",bestPositionForThisGhost," for ghost #",i," with action ",action," with probability ",bestProbabilityForThisGhost
+
+        distanceFromGhostToSuccessor = self.distancer.getDistance(successorPosition, bestPositionForThisGhost)
+        if distanceFromGhostToSuccessor < bestDistanceOverall:
+          bestAction = action
+          bestDistanceOverall = distanceFromGhostToSuccessor
+      print "\n"
+    return bestAction
