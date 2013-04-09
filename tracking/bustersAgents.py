@@ -115,7 +115,7 @@ class GreedyBustersAgent(BustersAgent):
 
         if not gameState.getLivingGhosts()[i]:
           #The ghost is not alive, so skip it
-          print "Ghost #",i," is dead."
+          #print "Ghost #",i," is dead."
           continue
         
         bestProbabilityForThisGhost = -1
@@ -130,7 +130,7 @@ class GreedyBustersAgent(BustersAgent):
               bestProbabilityForThisGhost = probability
               bestPositionForThisGhost = position
         
-        print "Best ghost location ",bestPositionForThisGhost," for ghost #",i," with action ",action," with probability ",bestProbabilityForThisGhost
+        #print "Best ghost location ",bestPositionForThisGhost," for ghost #",i," with action ",action," with probability ",bestProbabilityForThisGhost
 
         distanceFromGhostToSuccessor = self.distancer.getDistance(successorPosition, bestPositionForThisGhost)
         if distanceFromGhostToSuccessor < bestDistanceOverall:
