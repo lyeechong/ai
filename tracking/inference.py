@@ -197,57 +197,24 @@ class ParticleFilter(InferenceModule):
     "*** YOUR CODE HERE ***"
     self.beliefs = util.Counter()
     for i in range(self.numParticles): self.beliefs[random.choice(self.legalPositions)] += 1
-    #print 'THIS IS CALLED LOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
-    #print 'len of beleifs ',len(self.beliefs)
-    #self.beliefs.normalize()
-   
-    #import time
-    #sanity check
-    for i in self.beliefs.keys():
-      if not i in self.legalPositions:
-        #print 'KERNEL PANIC'
-        #time.sleep(20)
 
-  
   def observe(self, observation, gameState):
-    #import time
-    #print "OBSERVE IS CALLED!!!!"
-    #print "len of beliefs right now before observe stuff is done is ", len(self.beliefs.keys())
-    #time.sleep(1000000)
     "Update beliefs based on the given distance observation."
     emissionModel = busters.getObservationDistribution(observation)
     pacmanPosition = gameState.getPacmanPosition()
     "*** YOUR CODE HERE ***"
-    #temp = util.Counter()
     weights = util.Counter()
     for pos in self.beliefs:
-      #if self.beliefs[pos]==0: continue
-      #print emissionModel[util.manhattanDistance(pacmanPosition,pos)]
-      
-      #old kendall mult code
-      #self.beliefs[pos] *= emissionModel[util.manhattanDistance(pacmanPosition,pos)]
-
       weights[pos]=self.beliefs[pos]*emissionModel[util.manhattanDistance(pacmanPosition,pos)]
-      #self.beliefs[pos] = self.beliefs[pos] *  emissionModel[util.manhattanDistance(pacmanPosition,pos)]
-
-
     temp = util.Counter()
+    if weights.totalCount()==0:
+      self.initializeUniformly(gameState,self.numParticles)
+      return None
+
     for i in range(self.numParticles):
-      #print self.beliefs
-      #if self.beliefs.totalCount() == 0: print 'Why is this happening??? D: This will probably break everything\n', self.beliefs
       sample = util.sample(weights)
-      #print i
       temp[sample]+=1
     self.beliefs=temp
-    #print 'number of samples after resampling (should always be 300)',self.beliefs.totalCount()
-    #print 'length of beliefs in observe after observe is done ',len(self.beliefs.keys())
-    for i in self.beliefs.keys():
-      if not i in self.legalPositions:
-        #print 'KERNEL PANIC after observe called... something is illegal!'
-        #time.sleep(20)
-    
-    #time.sleep(20)
-
 
   def elapseTime(self, gameState):
     "Update beliefs for a time step elapsing."
@@ -264,16 +231,16 @@ class ParticleFilter(InferenceModule):
       #print 'position ', pos
       state = self.setGhostPosition(gameState,pos)
 
-      if not pos in self.legalPositions:
+      #if not pos in self.legalPositions:
         #print 'the position is not a legal position!! KERNEL PANIC'
         #time.sleep(20)
 
       #if self.getPositionDistribution
-      if state is None:
+      #if state is None:
         #print 'state was none'
           
       #import time 
-      if len(self.getPositionDistribution(state)) is 0: 
+      #if len(self.getPositionDistribution(state)) is 0: 
         #print 'the class of state is ', state.__class__.__name__
         #print 'position distribution ', self.getPositionDistribution(state)
         #time.sleep(10000000)
@@ -362,12 +329,56 @@ class JointParticleFilter:
           The ghost agent you are meant to supply is self.ghostAgents[ghostIndex-1],
           but in this project all ghost agents are always the same.
     """
+    #print gameState
     newParticles = []
     for oldParticle in self.particles:
       newParticle = list(oldParticle) # A list of ghost positions
       "*** YOUR CODE HERE ***"
+      state = setGhostPositions(gameState,newParticle)
+      for i in range(len(newParticle)):
+        newParticle[i]=util.sample(getPositionDistributionForGhost(state,i+1,self.ghostAgents[i]))
       newParticles.append(tuple(newParticle))
-    self.particles = newParticles
+    self.particles=newParticles
+
+
+    """
+    temp = []
+    #print 'len of self.beliefs at the start of elapse time ',len(self.beliefs.keys())
+    #print 'number of particles: ',self.numParticles
+    for vector in self.particles:
+
+      #if self.beliefs[pos]==0: continue
+            #print 'Ghost position ',pos
+      #print 'Position distribution ', self.getPositionDistribution(gameState)
+      #import time
+      #print 'position ', pos
+      state = setGhostPositions(gameState,vector)
+
+      #if not pos in self.legalPositions:
+        #print 'the position is not a legal position!! KERNEL PANIC'
+        #time.sleep(20)
+
+      #if self.getPositionDistribution
+      #if state is None:
+        #print 'state was none'
+          
+      #import time 
+      #if len(self.getPositionDistribution(state)) is 0: 
+        #print 'the class of state is ', state.__class__.__name__
+        #print 'position distribution ', self.getPositionDistribution(state)
+        #time.sleep(10000000)
+      #print self.beliefs[pos]
+      for gn in range(1,self.gameState.getNumAgents()):
+
+          newSample = util.sample(self.getPositionDistributionForGhost(state, gn, self.ghostAgents[gn-1]))
+          temp.append(newSample)
+    self.particles = temp
+    #print 'after elapse time ends, the length of self.beliefs is : ', len(self.beliefs.keys())
+    
+    #time.sleep(20)
+"""
+
+
   
   def observeState(self, gameState):
     """
@@ -387,6 +398,42 @@ class JointParticleFilter:
     emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
 
     "*** YOUR CODE HERE ***"
+    
+    """
+    def observe(self, observation, gameState):
+    emissionModel = busters.getObservationDistribution(observation)
+    pacmanPosition = gameState.getPacmanPosition()
+    weights = util.Counter()
+    for pos in self.beliefs:
+      weights[pos] = self.beliefs[pos]*emissionModel[util.manhattanDistance(pacmanPosition,pos)]
+    temp = util.Counter()
+    if weights.totalCount()==0:
+      self.initializeUniformly(gameState,self.numParticles)
+      return None
+
+    for i in range(self.numParticles):
+      sample = util.sample(weights)
+      temp[sample]+=1
+    self.beliefs=temp
+    """
+    
+    "*** YOUR CODE HERE ***"
+    weights = util.Counter()
+    for particle in self.particles:
+      avg = 0
+      for ghostNum in range(0, gameState.getNumAgents() - 1):
+        avg += emissionModels[ghostNum][util.manhattanDistance(pacmanPosition, particle[ghostNum])]
+      weights[particle] = avg / (gameState.getNumAgents() - 1)
+    temp = []
+    if weights.totalCount() is 0:
+      self.initializeUniformly(gameState, self.numParticles)
+      return None
+
+    for i in range(self.numParticles):
+      sample = util.sample(weights)
+      temp.append(sample)
+    self.particles = temp
+
   
   def getBeliefDistribution(self):
     dist = util.Counter()
