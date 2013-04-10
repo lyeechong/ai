@@ -446,7 +446,6 @@ class JointParticleFilter:
       for ghostNum in range(0, gameState.getNumAgents() - 1):
         noisyDistForGhost = emissionModels[ghostNum][util.manhattanDistance(pacmanPosition, particle[ghostNum])]
         avg += noisyDistForGhost
-      # bad
       weights[particle] += avg#= avg / (gameState.getNumAgents() - 1)
     temp = []
     if weights.totalCount() is 0:
