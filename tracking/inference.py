@@ -418,11 +418,16 @@ class JointParticleFilter:
     """
     
     "*** YOUR CODE HERE ***"
+    
+    if 999 in noisyDistances:
+      print 'ghost captured! muhahahah!'
+    
     weights = util.Counter()
     for particle in self.particles:
       avg = 0
       for ghostNum in range(0, gameState.getNumAgents() - 1):
-        avg += emissionModels[ghostNum][util.manhattanDistance(pacmanPosition, particle[ghostNum])]
+        noisyDistForGhost = emissionModels[ghostNum][util.manhattanDistance(pacmanPosition, particle[ghostNum])]
+        avg += noisyDistForGhost
       weights[particle] = avg / (gameState.getNumAgents() - 1)
     temp = []
     if weights.totalCount() is 0:
