@@ -419,9 +419,27 @@ class JointParticleFilter:
     
     "*** YOUR CODE HERE ***"
     
+    for k in range(len(noisyDistances)):
+      if noisyDistances[k]==999:
+        for z in range(len(self.particles)):
+          newParticle = list(self.particles[z])
+          newParticle[k]=(2*k-1,1)
+          self.particles[z]=tuple(newParticle)
+    """
     if 999 in noisyDistances:
-      print 'ghost captured! muhahahah!'
-    
+      newSelfParticles = []
+      for k in noisyDistances:
+        if k is 999:
+          for particle in self.particles:
+            newParticle = list(particle)
+            newParticle[k] = (2*k-1, 1)
+            particle = tuple(newParticle)
+            newSelfParticles.append(particle)
+      print 'length of the newSelfParticles is ', len(newSelfParticles)
+      import time
+      time.sleep(20)
+      self.particles = newSelfParticles
+    """
     weights = util.Counter()
     for particle in self.particles:
       avg = 0
@@ -431,7 +449,7 @@ class JointParticleFilter:
       weights[particle] = avg / (gameState.getNumAgents() - 1)
     temp = []
     if weights.totalCount() is 0:
-      self.initializeUniformly(gameState, self.numParticles)
+      self.initializeParticles()
       return None
 
     for i in range(self.numParticles):
