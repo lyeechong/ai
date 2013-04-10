@@ -197,22 +197,22 @@ class ParticleFilter(InferenceModule):
     "*** YOUR CODE HERE ***"
     self.beliefs = util.Counter()
     for i in range(self.numParticles): self.beliefs[random.choice(self.legalPositions)] += 1
-    print 'THIS IS CALLED LOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
-    print 'len of beleifs ',len(self.beliefs)
+    #print 'THIS IS CALLED LOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
+    #print 'len of beleifs ',len(self.beliefs)
     #self.beliefs.normalize()
    
-    import time
+    #import time
     #sanity check
     for i in self.beliefs.keys():
       if not i in self.legalPositions:
-        print 'KERNEL PANIC'
-        time.sleep(20)
+        #print 'KERNEL PANIC'
+        #time.sleep(20)
 
   
   def observe(self, observation, gameState):
-    import time
-    print "OBSERVE IS CALLED!!!!"
-    print "len of beliefs right now before observe stuff is done is ", len(self.beliefs.keys())
+    #import time
+    #print "OBSERVE IS CALLED!!!!"
+    #print "len of beliefs right now before observe stuff is done is ", len(self.beliefs.keys())
     #time.sleep(1000000)
     "Update beliefs based on the given distance observation."
     emissionModel = busters.getObservationDistribution(observation)
@@ -239,12 +239,12 @@ class ParticleFilter(InferenceModule):
       #print i
       temp[sample]+=1
     self.beliefs=temp
-    print 'number of samples after resampling (should always be 300)',self.beliefs.totalCount()
-    print 'length of beliefs in observe after observe is done ',len(self.beliefs.keys())
+    #print 'number of samples after resampling (should always be 300)',self.beliefs.totalCount()
+    #print 'length of beliefs in observe after observe is done ',len(self.beliefs.keys())
     for i in self.beliefs.keys():
       if not i in self.legalPositions:
-        print 'KERNEL PANIC after observe called... something is illegal!'
-        time.sleep(20)
+        #print 'KERNEL PANIC after observe called... something is illegal!'
+        #time.sleep(20)
     
     #time.sleep(20)
 
@@ -253,36 +253,36 @@ class ParticleFilter(InferenceModule):
     "Update beliefs for a time step elapsing."
     "*** YOUR CODE HERE ***"
     temp = util.Counter()
-    print 'len of self.beliefs at the start of elapse time ',len(self.beliefs.keys())
-    print 'number of particles: ',self.numParticles
+    #print 'len of self.beliefs at the start of elapse time ',len(self.beliefs.keys())
+    #print 'number of particles: ',self.numParticles
     for pos in self.beliefs.keys():
 
       #if self.beliefs[pos]==0: continue
             #print 'Ghost position ',pos
       #print 'Position distribution ', self.getPositionDistribution(gameState)
       #import time
-      print 'position ', pos
+      #print 'position ', pos
       state = self.setGhostPosition(gameState,pos)
 
       if not pos in self.legalPositions:
-        print 'the position is not a legal position!! KERNEL PANIC'
-        time.sleep(20)
+        #print 'the position is not a legal position!! KERNEL PANIC'
+        #time.sleep(20)
 
       #if self.getPositionDistribution
       if state is None:
-        print 'state was none'
+        #print 'state was none'
           
-      import time 
+      #import time 
       if len(self.getPositionDistribution(state)) is 0: 
-        print 'the class of state is ', state.__class__.__name__
-        print 'position distribution ', self.getPositionDistribution(state)
-        time.sleep(10000000)
-      print self.beliefs[pos]
+        #print 'the class of state is ', state.__class__.__name__
+        #print 'position distribution ', self.getPositionDistribution(state)
+        #time.sleep(10000000)
+      #print self.beliefs[pos]
       for i in range(self.beliefs[pos]):
         newSample = util.sample(self.getPositionDistribution(state))
         temp[newSample]+=1
     self.beliefs=temp
-    print 'after elapse time ends, the length of self.beliefs is : ', len(self.beliefs.keys())
+    #print 'after elapse time ends, the length of self.beliefs is : ', len(self.beliefs.keys())
     
     #time.sleep(20)
 
