@@ -195,18 +195,64 @@ class ParticleFilter(InferenceModule):
     "Initializes a list of particles."
     self.numParticles = numParticles
     "*** YOUR CODE HERE ***"
+    self.beliefs = util.Counter()
+    for i in range(self.numParticles): self.beliefs[random.choice(self.legalPositions)] += 1.0
+    print 'THIS IS CALLED LOOK HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
+    print 'len of beleifs ',len(self.beliefs)
+    #self.beliefs.normalize()
+
   
   def observe(self, observation, gameState):
     "Update beliefs based on the given distance observation."
     emissionModel = busters.getObservationDistribution(observation)
     pacmanPosition = gameState.getPacmanPosition()
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    
+    #temp = util.Counter()
+    for pos in self.beliefs:
+      #if self.beliefs[pos]==0: continue
+      #print emissionModel[util.manhattanDistance(pacmanPosition,pos)]
+      self.beliefs[pos] *= emissionModel[util.manhattanDistance(pacmanPosition,pos)]
+    temp = util.Counter()
+    for i in range(self.numParticles):
+      #print self.beliefs
+      if self.beliefs.totalCount() == 0: print 'Why is this happening??? D: This will probably break everything\n', self.beliefs
+      sample = util.sample(self.beliefs)
+      #print i
+      temp[sample]+=1
+    self.beliefs=temp
+    print 'length of beliefs in observe ',len(self.beliefs)
+
+
+
   def elapseTime(self, gameState):
     "Update beliefs for a time step elapsing."
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    temp = util.Counter()
+    print 'len ',len(self.beliefs)
+    print 'number of particles: ',self.numParticles
+    for pos in self.beliefs:
+      #if self.beliefs[pos]==0: continue
+            #print 'Ghost position ',pos
+      #print 'Position distribution ', self.getPositionDistribution(gameState)
+      #import time
+      print 'position ', pos
+      state = self.setGhostPosition(gameState,pos)
+      #if self.getPositionDistribution
+      if state is None:
+        print 'state was none'
+          
+      import time 
+      if len(self.getPositionDistribution(state)) is 0: 
+        print 'position distribution ', self.getPositionDistribution(state)
+        time.sleep(10000000)
+      
+
+      newSample = util.sample(self.getPositionDistribution(state))
+      temp[newSample]+=1
+    self.beliefs=temp
+
+
+
 
   def getBeliefDistribution(self):
     """
@@ -214,7 +260,7 @@ class ParticleFilter(InferenceModule):
     ghost locations conditioned on all evidence and time passage.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return self.beliefs
 
 class MarginalInference(InferenceModule):
   "A wrapper around the JointInference module that returns marginal beliefs about ghosts."
