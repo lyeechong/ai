@@ -1,0 +1,132 @@
+# valueIterationAgents.py
+# -----------------------
+# Licensing Information: Please do not distribute or publish solutions to this
+# project. You are free to use and extend these projects for educational
+# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
+# John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
+# For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
+
+import mdp, util
+
+from learningAgents import ValueEstimationAgent
+
+class ValueIterationAgent(ValueEstimationAgent):
+  """
+      * Please read learningAgents.py before reading this.*
+
+      A ValueIterationAgent takes a Markov decision process
+      (see mdp.py) on initialization and runs value iteration
+      for a given number of iterations using the supplied
+      discount factor.
+  """
+  def __init__(self, mdp, discount = 0.9, iterations = 100):
+    """
+      Your value iteration agent should take an mdp on
+      construction, run the indicated number of iterations
+      and then act according to the resulting policy.
+    
+      Some useful mdp methods you will use:
+          mdp.getStates()
+          mdp.getPossibleActions(state)
+          mdp.getTransitionStatesAndProbs(state, action)
+          mdp.getReward(state, action, nextState)
+    """
+    self.mdp = mdp
+    self.discount = discount
+    self.iterations = iterations
+    self.values = util.Counter() # A Counter is a dict with default 0
+     
+    "*** YOUR CODE HERE ***"
+    # OUR CODE HERE
+    #Note: I think we should use the util.Counter thing?
+    for times in range(0, iterations):
+      #values from previous iteration so we don't update over them while iterating
+      prevVals = self.values.copy()
+      #iterate through all states
+      for state in mdp.getStates():
+        #will store the action-value for the iteration
+        value = util.Counter()
+        for action in mdp.getPossibleActions(state):
+          for transitionState, probability in mdp.getTransitionStatesAndProbs(state, action):
+            #expected value, probability * reward for the state with the discount * reward
+            value[action] += probability * (mdp.getReward( state, action, transitionState) + discount * prevVals[transitionState])
+        #update the values to the new value from the iteration
+        #the .argMax() function returns the one with the largest value
+        self.values[state] = value[value.argMax()]
+    # END OUR CODE
+    
+  def getValue(self, state):
+    """
+      Return the value of the state (computed in __init__).
+    """
+    return self.values[state]
+
+
+  def getQValue(self, state, action):
+    """
+      The q-value of the state action pair
+      (after the indicated number of value iteration
+      passes).  Note that value iteration does not
+      necessarily create this quantity and you may have
+      to derive it on the fly.
+    """
+    "*** YOUR CODE HERE ***"
+    # OUR CODE HERE
+    #get the value of the state
+    qVal = self.values[state]
+    #iterate through the MDP transition states from the current state
+    for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+      #q value = discount * expected value of reward of state
+      qVal += self.discount * probability * self.values[transitionState]
+    return qVal
+    # END OUR CODE
+
+  def getPolicy(self, state):
+    """
+      The policy is the best action in the given state
+      according to the values computed by value iteration.
+      You may break ties any way you see fit.  Note that if
+      there are no legal actions, which is the case at the
+      terminal state, you should return None.
+    """
+    "*** YOUR CODE HERE ***"
+    # OUR CODE HERE
+    possibleActions = self.mdp.getPossibleActions(state)
+    #checking for terminal state (no possible actions)
+    if len(possibleActions) is 0: 
+      return None
+      
+    #attempt at using the Counter
+    eValsActions = util.Counter()
+    for action in possibleActions_actions:
+      for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+        eValsActions[action] += probability * (self.mdp.getReward( state, action, transitionState) + self.discount * self.values[transitionState])
+            
+    return eValsActions.argMax()
+      
+    #fail attempt using lists :(
+    """
+    #list to hold the expected value of the actions
+    eValsActions = []
+    #iterate through all actions and their transtion states
+    for action in possibleActions:
+      for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+        #expected value of reward with discount * the value of the transitions
+        eValsActions[action] += probability * (self.mdp.getReward( state, action, transitionState) + self.discount * self.values[transitionState])
+            
+    #now iterate through and find the action with the best value
+    #(that will be the best action)
+    maxVal = -float("inf")
+    bestAction = None
+    for action in possibleActions:
+      if eValsActions[action] > maxVal:
+        maxVal = eValsAction[action]
+        bestAction = action
+    """
+    return action
+    # END OUR CODE
+
+  def getAction(self, state):
+    "Returns the policy at the state (no exploration)."
+    return self.getPolicy(state)
+  
