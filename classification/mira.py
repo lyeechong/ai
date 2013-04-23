@@ -49,10 +49,13 @@ class MiraClassifier:
     "*** YOUR CODE HERE ***"
     
     # -- OUR CODE HERE
-    for iteration in range(self.max_iterations):
-      print "Starting iteration ", iteration, "..."
-      for c in Cgrid:
-        c = c * 1.0
+    cCorrect = util.Counter()
+    weightsForC = {}
+    for c in Cgrid:
+      c = c * 1.0
+      for iteration in range(self.max_iterations):
+        print "Starting iteration ", iteration, "..."
+      
         for i in range(len(trainingData)):
           currentTrainingData = trainingData[i]
           trueLabel = trainingLabels[i]
@@ -90,7 +93,19 @@ class MiraClassifier:
             
             self.weights[trueLabel] = self.weights[trueLabel].__add__(multWithRho)
             self.weights[bestLabel] = self.weights[bestLabel].__sub__(multWithRho) 
+
+      # -- done with the iterations, time to check how good the C was
+            
+      guesses = self.classify(validationData)
       
+      for labelNum in range(len(guesses)):
+        if guesses[labelNum] is validationLabels[labelNum]:
+          cCorrect[c] += 1.0
+      
+      
+      weightsForC[c] = self.weights
+      
+    self.weights = weightsForC[cCorrect.argMax()]
     # -- END OUR CODE
     
   def classify(self, data ):

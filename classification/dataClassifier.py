@@ -64,8 +64,28 @@ def enhancedFeatureExtractorDigit(datum):
 
   "*** YOUR CODE HERE ***"
   
+  # -- OUR CODE HERE
+  
+  # -- attempt at floodFill stuff
+  
+  # -- end attempt at floodFill stuff
+  
+  # -- END OUR CODE
+  
   return features
 
+def floodFill(matrix, pixelType, otherPixelType, r, c, numRows, numCols):
+  
+  if not matrix[r][c] is pixelType:
+    return 0
+  else:
+    matrix[r][c] = otherPixelType
+    one = floodFill(matrix, pixelType, otherPixelType, r+1, c, numRows, numCols)
+    two = floodFill(matrix, pixelType, otherPixelType, r-1, c, numRows, numCols)
+    three = floodFill(matrix, pixelType, otherPixelType, r, c+1, numRows, numCols)
+    four = floodFill(matrix, pixelType, otherPixelType, r, c-1, numRows, numCols)
+    return 1 + one + two + three + four
+  
 
 def contestFeatureExtractorDigit(datum):
   """
