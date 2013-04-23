@@ -126,6 +126,9 @@ def contestFeatureExtractorDigit(datum):
   Specify features to use for the minicontest
   """
   features =  basicFeatureExtractorDigit(datum)
+  
+  enhancedFeatureExtractorDigit(datum)
+  
   return features
 
 def enhancedFeatureExtractorFace(datum):

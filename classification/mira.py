@@ -68,7 +68,7 @@ class MiraClassifier:
             label = self.legalLabels[j]
             for pixel in currentTrainingData:
               score += self.weights[label][pixel] * currentTrainingData[pixel] * 1.0
-            if score > bestScore:
+            if score >= bestScore:
                 bestScore = score
                 bestLabel = label
                   
@@ -105,7 +105,16 @@ class MiraClassifier:
       
       weightsForC[c] = self.weights
       
-    self.weights = weightsForC[cCorrect.argMax()]
+    bestC = float("inf")
+    bestValue = -float("inf")
+    for cchoice in cCorrect:
+      cvalue = cCorrect[cchoice]
+      if cvalue >= bestValue:
+        bestC = min(bestC, cchoice)
+        bestValue = cvalue
+      
+    print cCorrect
+    self.weights = weightsForC[bestC]
     # -- END OUR CODE
     
   def classify(self, data ):
