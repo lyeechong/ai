@@ -158,9 +158,9 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       row = pixel[1]
       heat = table[pixel]
       if heat > 3.0:
-        heat = "###"
+        heat = "#"
       else:
-        heat = "   "
+        heat = " "
       my_matrix[row][col] = heat
     
     import string
@@ -237,8 +237,18 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     featuresOdds = []
         
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    
+    cpTable1 = self.conditionalProb[label1]
+    cpTable2 = self.conditionalProb[label2]
+    
+    dictionaryOfPixelToOdds = {}
+    
+    for pixel in cpTable1:
+      dictionaryOfPixelToOdds[pixel] = cpTable1[pixel] / cpTable2[pixel]
+        
+    featuresOdds = sorted(dictionaryOfPixelToOdds, key = dictionaryOfPixelToOdds.get, reverse = True)
+    featuresOdds = featuresOdds[:100]
+    
     return featuresOdds
     
 
