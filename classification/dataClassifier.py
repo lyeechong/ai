@@ -67,7 +67,31 @@ def enhancedFeatureExtractorDigit(datum):
   # -- OUR CODE HERE
   
   # -- attempt at floodFill stuff
+  matrix = [[0 for i in range(DIGIT_DATUM_WIDTH)] for j in range(DIGIT_DATUM_HEIGHT)]
+  for x in range(DIGIT_DATUM_WIDTH):
+    for y in range(DIGIT_DATUM_HEIGHT):
+      if datum.getPixel(x, y) > 0:
+        matrix[x][y] = 1
+      else:
+        matrix[x][y] = 0
   
+  # -- stores the sizes of contiguous regions of pixels which are off
+  offPixelSizes = []
+  import copy
+  matrixCopy = copy.deepcopy(matrix)
+  for x in range(DIGIT_DATUM_WIDTH):
+    for y in range(DIGIT_DATUM_HEIGHT):
+      if matrixCopy[x][y] is 0:
+        numContiguousPixelsInRegion = floodFill(matrixCopy, 0, 1, x, y, DIGIT_DATUM_WIDTH, DIGIT_DATUM_HEIGHT)
+        offPixelSizes.append(numContiguousPixelsInRegion)
+          
+  numberOfDisjointBlackRegions = len(set(offPixelSizes))
+
+  if numberOfDisjointBlackRegions > 1:
+    features["moreThanOneConnBlackRegions"] = 1
+  else:
+    features["moreThanOneConnBlackRegions"] = 0
+    
   # -- end attempt at floodFill stuff
   
   # -- END OUR CODE
@@ -80,12 +104,22 @@ def floodFill(matrix, pixelType, otherPixelType, r, c, numRows, numCols):
     return 0
   else:
     matrix[r][c] = otherPixelType
-    one = floodFill(matrix, pixelType, otherPixelType, r+1, c, numRows, numCols)
-    two = floodFill(matrix, pixelType, otherPixelType, r-1, c, numRows, numCols)
-    three = floodFill(matrix, pixelType, otherPixelType, r, c+1, numRows, numCols)
-    four = floodFill(matrix, pixelType, otherPixelType, r, c-1, numRows, numCols)
+    one = 0
+    two = 0
+    three = 0
+    four = 0   
+    if inBounds(r+1, c, numRows, numCols):
+      one = floodFill(matrix, pixelType, otherPixelType, r+1, c, numRows, numCols)
+    if inBounds(r-1, c, numRows, numCols):
+      two = floodFill(matrix, pixelType, otherPixelType, r-1, c, numRows, numCols)
+    if inBounds(r, c+1, numRows, numCols):
+      three = floodFill(matrix, pixelType, otherPixelType, r, c+1, numRows, numCols)
+    if inBounds(r, c-1, numRows, numCols):
+      four = floodFill(matrix, pixelType, otherPixelType, r, c-1, numRows, numCols)
     return 1 + one + two + three + four
-  
+
+def inBounds(r, c, numRows, numCols):
+  return r < numRows and r >= 0 and c < numCols and c >= 0
 
 def contestFeatureExtractorDigit(datum):
   """

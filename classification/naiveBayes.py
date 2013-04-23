@@ -101,6 +101,11 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
         
         # -- iterate through each pixel and update the conditional prob counter for that label
         for pixel in trainingData[dataNum]:
+          
+          if pixel is "moreThanOneConnBlackRegions":
+            #print "Number is :: ", label, " and has ", trainingData[dataNum][pixel]
+            assert 1 is 1
+          
           on_off = trainingData[dataNum][pixel] * 1.0
           self.conditionalProb[label][pixel] += on_off * 1.0
           
@@ -113,7 +118,6 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
           assert self.conditionalProb[label][pixel] >= k # -- sanity check that it should be at least k
           self.conditionalProb[label][pixel] /= (self.prior[label] * len(trainingLabels) + k*2)
           
-
       # !!!! -- debugging zone ahead!
       
       #self.printCondProbTableThing(self.conditionalProb[1])
@@ -124,10 +128,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       
       # -- then we go through each of the conditional probability tables for the labels
       # -- and normalize them
-      #for label in legalLabels:
-      #  self.conditionalProb[label].normalize()
-      #no we don't ~~~
-      
+
 
               
       guesses = self.classify(validationData)
