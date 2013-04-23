@@ -66,6 +66,8 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     for label in trainingLabels:
       self.prior[label] += 1.0
     self.prior.normalize()
+    #for label in self.prior:
+    #  self.prior[label]/=len(trainingLabels)
     
     """
     print "legal labels are ", len(legalLabels)
@@ -109,6 +111,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
           # -- add the k value     
           self.conditionalProb[label][pixel] += k * 1.0
           assert self.conditionalProb[label][pixel] >= k # -- sanity check that it should be at least k
+          self.conditionalProb[label][pixel] /= (self.prior[label] * len(trainingLabels) + k*2)
           
 
       # !!!! -- debugging zone ahead!
@@ -121,8 +124,11 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       
       # -- then we go through each of the conditional probability tables for the labels
       # -- and normalize them
-      for label in legalLabels:
-        self.conditionalProb[label].normalize()
+      #for label in legalLabels:
+      #  self.conditionalProb[label].normalize()
+      #no we don't ~~~
+      
+
               
       guesses = self.classify(validationData)
 
@@ -201,22 +207,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       for pixel in self.conditionalProb[label]:
         if datum[pixel] is 1:
           #assert self.conditionalProb[label][pixel] < 1.0 # -- sanity check that the probability is valid
-          sumThing += math.log(self.conditionalProb[label][pixel]*1.0)
-          
+          sumThing += math.log((self.conditionalProb[label][pixel]*1.0))
+        else:
+          sumThing+=math.log(1-self.conditionalProb[label][pixel]*1.0)
       logJoint[label] = math.log(self.prior[label]*1.0) + sumThing*1.0
       
-    
-    """
-    # -- Lyee's random code which gets 46%
-    chances = util.Counter()
-    for label in self.legalLabels:
-      for pixel in self.conditionalProb[label]:        
-        if datum[pixel] is 1:
-          chances[label] += self.conditionalProb[label][pixel]
-    
-    chances.normalize()    
-    return chances
-    """
+
     
     
     import time
