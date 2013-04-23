@@ -47,8 +47,52 @@ class MiraClassifier:
     representing a vector of values.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    
+    # -- OUR CODE HERE
+    for iteration in range(self.max_iterations):
+      print "Starting iteration ", iteration, "..."
+      for c in Cgrid:
+        c = c * 1.0
+        for i in range(len(trainingData)):
+          currentTrainingData = trainingData[i]
+          trueLabel = trainingLabels[i]
+                  
+          # -- find the score        
+          bestScore = -float("inf")
+          bestLabel = None
+          for j in range(len(self.legalLabels)):          
+            score = 0.0
+            label = self.legalLabels[j]
+            for pixel in currentTrainingData:
+              score += self.weights[label][pixel] * currentTrainingData[pixel] * 1.0
+            if score > bestScore:
+                bestScore = score
+                bestLabel = label
+                  
+          if not bestLabel is trueLabel:
+            
+            # -- time to calculate rho
+          
+            choice1 = c
+            
+            numerator = (self.weights[bestLabel].__sub__(self.weights[trueLabel])).__mul__(currentTrainingData) + 1
+            denominator = 2 * currentTrainingData.__mul__(currentTrainingData)
+                      
+            choice2 = numerator / denominator * 1.0
+            
+            rho = min(choice1, choice2) 
+          
+            # -- finished calculating rho
+            import copy
+            multWithRho = copy.deepcopy(currentTrainingData)
+            for key in multWithRho:
+              multWithRho[key] *= rho
+            
+            self.weights[trueLabel] = self.weights[trueLabel].__add__(multWithRho)
+            self.weights[bestLabel] = self.weights[bestLabel].__sub__(multWithRho) 
+      
+    # -- END OUR CODE
+    
   def classify(self, data ):
     """
     Classifies each datum as the label that most closely matches the prototype vector
