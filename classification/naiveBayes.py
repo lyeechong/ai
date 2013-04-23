@@ -51,8 +51,102 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # -- calls the classify method to evaluate performance    
+    # -- OUR CODE HERE
+    
+    features = self.features
+    legalLabels = self.legalLabels
+    
+    kCorrect = util.Counter()
+    self.conditionalProb = []
+    
+    
+    self.prior = util.Counter()
+    for label in trainingLabels:
+      self.prior[label] += 1 * 1.0
+    self.prior.normalize()
+    
+    print "legal labels are ", len(legalLabels)
+    print "kgrid is ", kgrid
+    print "the legal labels are.... ", legalLabels
+    
+    # -- iterate through each k in kgrid... should we be doing this?
+    # -- won't this affect the cond prob tables? :(
+    for k in kgrid:
+      k = k * 1.0
+      print "working on k = ",k," in kgrid"
+      
+      # -- reset the conditonal prob table
+      # -- each time we go through a different k...
+      self.conditionalProb = {}
+      
+      # -- go through each label and initialize the Counter for that label (the cond prob table)
+      for label in legalLabels:
+        self.conditionalProb[label] = util.Counter()
         
+      # -- go through each piece of training data and train the tables on it  
+      for dataNum in range(len(trainingData)):
+      
+        # -- identify which label we're using... not sure if this is correct
+        label = trainingLabels[dataNum] # 0 or like 9 or 2
+        
+        # -- iterate through each pixel and update the conditional prob counter for that label
+        for pixel in trainingData[dataNum]:
+          on_off = trainingData[dataNum][pixel] * 1.0
+          self.conditionalProb[label][pixel] += on_off * 1.0
+          
+      # -- now we go through and add k to each of the conditional probabilities
+      # -- note that we do so for each label and every single pixel
+      for label in legalLabels:
+        for pixel in self.conditionalProb[label]:     
+          # -- add the k value     
+          self.conditionalProb[label][pixel] += k * 1.0
+          assert self.conditionalProb[label][pixel] >= k # -- sanity check that it should be at least k
+
+
+      # !!!! -- debugging zone ahead!
+      self.printCondProbTableThing(self.conditionalProb[0])
+      import time
+      time.sleep(30)
+      # !!!! -- end debugging zone!
+      
+      
+      # -- then we go through each of the conditional probability tables for the labels
+      # -- and normalize them
+      for label in legalLabels:
+        self.conditionalProb[label].normalize()
+      
+      guesses = self.classify(validationData)
+      
+      for labelNum in range(len(guesses)):
+        if guesses[labelNum] is validationLabels[labelNum]:
+          kCorrect[k] += 1 * 1.0
+    
+    return kCorrect.argMax() 
+        
+       
+    # -- END OUR CODE
+    #util.raiseNotDefined()
+  
+  
+  # -- this is Lyee's method to print out a conditonal probabilty table
+  def printCondProbTableThing(self, table):
+    """
+    Lyee's method!
+    """
+    my_matrix = [][]
+    for pixel in table:
+      row = pixel[0]
+      col = pixel[1]
+      heat = table[pixel]
+      heatMap[row][col] = heat
+    
+    import string
+    max_lens = [max([len(str(r[i])) for r in my_matrix]) for i in range(len(my_matrix[0]))]
+    print "\n".join(["".join([string.ljust(str(e), l + 2) for e, l in zip(r, max_lens)]) for r in my_matrix])
+
+  
   def classify(self, testData):
     """
     Classify the data based on the posterior distribution over labels.
@@ -76,7 +170,25 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     logJoint = util.Counter()
     
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    # -- OUR CODE HERE
+    
+    import math
+    for label in self.legalLabels:
+      sumThing = 0.0
+      for pixel in self.conditionalProb[label]:
+        assert self.conditionalProb[label][pixel] < 1.0 # -- sanity check that the probability is valid
+        sumThing += math.log(self.conditionalProb[label][pixel]*1.0)
+         
+      logJoint[label] = math.log(1.0*self.prior[label]*1.0) + sumThing*1.0
+      
+    
+    
+    
+    #util.raiseNotDefined()
+    
+    # -- uses the conditional probability tables computed in the current iteration
+    # -- in train and tune
     
     return logJoint
   
