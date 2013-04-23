@@ -64,18 +64,24 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     
     self.prior = util.Counter()
     for label in trainingLabels:
-      self.prior[label] += 1 * 1.0
+      self.prior[label] += 1.0
     self.prior.normalize()
     
+    """
     print "legal labels are ", len(legalLabels)
     print "kgrid is ", kgrid
     print "the legal labels are.... ", legalLabels
+    """
+    
+    import time
+    
+    condprobForK = {}
     
     # -- iterate through each k in kgrid... should we be doing this?
     # -- won't this affect the cond prob tables? :(
     for k in kgrid:
       k = k * 1.0
-      print "working on k = ",k," in kgrid"
+      #print "working on k = ",k," in kgrid"
       
       # -- reset the conditonal prob table
       # -- each time we go through a different k...
@@ -103,12 +109,13 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
           # -- add the k value     
           self.conditionalProb[label][pixel] += k * 1.0
           assert self.conditionalProb[label][pixel] >= k # -- sanity check that it should be at least k
-
+          
 
       # !!!! -- debugging zone ahead!
-      self.printCondProbTableThing(self.conditionalProb[0])
-      import time
-      time.sleep(30)
+      
+      #self.printCondProbTableThing(self.conditionalProb[1])
+      #time.sleep(30)
+      
       # !!!! -- end debugging zone!
       
       
@@ -116,14 +123,24 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       # -- and normalize them
       for label in legalLabels:
         self.conditionalProb[label].normalize()
-      
+              
       guesses = self.classify(validationData)
+
+
+      #print "the guesses are :: "
+      #print guesses
+      #print "the actual answers :: "
+      #print validationLabels
+      #assert len(guesses) is len(validationLabels)
+      #time.sleep(10)
       
       for labelNum in range(len(guesses)):
         if guesses[labelNum] is validationLabels[labelNum]:
           kCorrect[k] += 1 * 1.0
-    
-    return kCorrect.argMax() 
+      
+      condprobForK[k] = self.conditionalProb
+      
+    self.conditionalProb = condprobForK[kCorrect.argMax()]
         
        
     # -- END OUR CODE
@@ -135,12 +152,16 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
     Lyee's method!
     """
-    my_matrix = [][]
+    my_matrix = [[0 for i in range(28)] for j in range(28)]
     for pixel in table:
-      row = pixel[0]
-      col = pixel[1]
+      col = pixel[0]
+      row = pixel[1]
       heat = table[pixel]
-      heatMap[row][col] = heat
+      if heat > 3.0:
+        heat = "###"
+      else:
+        heat = "   "
+      my_matrix[row][col] = heat
     
     import string
     max_lens = [max([len(str(r[i])) for r in my_matrix]) for i in range(len(my_matrix[0]))]
@@ -173,19 +194,35 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     
     # -- OUR CODE HERE
     
+    
     import math
     for label in self.legalLabels:
       sumThing = 0.0
       for pixel in self.conditionalProb[label]:
-        assert self.conditionalProb[label][pixel] < 1.0 # -- sanity check that the probability is valid
-        sumThing += math.log(self.conditionalProb[label][pixel]*1.0)
-         
-      logJoint[label] = math.log(1.0*self.prior[label]*1.0) + sumThing*1.0
+        if datum[pixel] is 1:
+          #assert self.conditionalProb[label][pixel] < 1.0 # -- sanity check that the probability is valid
+          sumThing += math.log(self.conditionalProb[label][pixel]*1.0)
+          
+      logJoint[label] = math.log(self.prior[label]*1.0) + sumThing*1.0
       
     
+    """
+    # -- Lyee's random code which gets 46%
+    chances = util.Counter()
+    for label in self.legalLabels:
+      for pixel in self.conditionalProb[label]:        
+        if datum[pixel] is 1:
+          chances[label] += self.conditionalProb[label][pixel]
+    
+    chances.normalize()    
+    return chances
+    """
     
     
-    #util.raiseNotDefined()
+    import time
+    #print "logJoint is :: ", logJoint
+    #time.sleep(2)
+    
     
     # -- uses the conditional probability tables computed in the current iteration
     # -- in train and tune
