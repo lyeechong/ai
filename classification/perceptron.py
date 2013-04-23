@@ -30,12 +30,34 @@ class PerceptronClassifier:
     """
     
     self.features = trainingData[0].keys() # could be useful later
-    
+
     for iteration in range(self.max_iterations):
       print "Starting iteration ", iteration, "..."
       for i in range(len(trainingData)):
           "*** YOUR CODE HERE ***"
-          util.raiseNotDefined()
+          
+          # -- OUR CODE HERE
+          
+          
+          data = trainingData[i]
+          trueLabel = trainingLabels[i]
+          
+          bestScore = -float("inf")
+          bestLabel = None
+          for j in range(len(self.legalLabels)):
+            currentScore = 0.0
+            label = self.legalLabels[j]
+            for pixel in data:
+              currentScore += self.weights[label][pixel] * data[pixel] * 1.0
+            if currentScore > bestScore:
+              import time
+              bestScore = currentScore
+              bestLabel = label
+          
+          if not bestLabel is trueLabel:
+            self.weights[trueLabel] = self.weights[trueLabel].__add__(data)
+            self.weights[bestLabel] = self.weights[bestLabel].__sub__(data)
+          # -- END OUR CODE
     
   def classify(self, data ):
     """
